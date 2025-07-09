@@ -32,10 +32,8 @@ private:
 private:
     Ui::FormHistory *ui;
     QStandardItemModel *m_model;
-
     QFile m_file;
     QTextStream m_stream;
-
     bool m_headerWritten = false;
 };
 

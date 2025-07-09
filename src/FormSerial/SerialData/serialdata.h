@@ -15,8 +15,10 @@ class SerialData : public QWidget
 public:
     explicit SerialData(QWidget *parent = nullptr);
     ~SerialData();
+
 signals:
     void serialDataClose();
+
 public slots:
     void onSerialDataReceive(const QByteArray &data);
 

@@ -15,17 +15,15 @@ class PlotHistory : public QWidget
 public:
     explicit PlotHistory(QWidget *parent = nullptr);
     ~PlotHistory();
+
 signals:
     void plotHistoryClose();
+
 public slots:
     void updateChart(const QList<QPointF> &v24);
 
-private:
-    Ui::PlotHistory *ui;
-
-    // QWidget interface
 protected:
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void on_tBtnPrev_clicked();
@@ -33,16 +31,19 @@ private slots:
     void on_lineEditGo_editingFinished();
 
 private:
+    void fillChart(const QList<QPointF> &v24);
+    void init();
+
+private:
+    Ui::PlotHistory *ui;
     QList<QList<QPointF>> m_listV24;
     int m_current = 0;
-    int m_total;
-    void fillChart(const QList<QPointF> &v24);
+    int m_total;    
     MyChartView *m_chartView = nullptr;
     QChart *m_chart = nullptr;
     QLineSeries *m_series;
     QValueAxis *m_axisX;
     QValueAxis *m_axisY;
-    void init();
 };
 
 #endif // PLOTHISTORY_H

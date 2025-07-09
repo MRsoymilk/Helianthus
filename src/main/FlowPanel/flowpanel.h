@@ -18,14 +18,11 @@ class FlowPanel : public QWidget
 public:
     explicit FlowPanel(QWidget *parent = nullptr);
     ~FlowPanel();
+
 signals:
     void switchForm(FORM f);
     void pinPanel(bool isPin);
 
-private:
-    Ui::FlowPanel *ui;
-
-    // QWidget interface
 protected:
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
@@ -42,8 +39,11 @@ private slots:
     void on_btnSetting_clicked();
 
 private:
-    QPropertyAnimation *animation;
     void init();
+
+private:
+    Ui::FlowPanel *ui;
+    QPropertyAnimation *animation;
     int m_visual_size = 20;
     bool m_pinned = false;
 };

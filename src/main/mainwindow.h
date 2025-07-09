@@ -29,6 +29,10 @@ public slots:
     void onSwitchForm(FORM f);
 
 private:
+    void init();
+    void setTheme();
+
+private:
     Ui::MainWindow *ui;
     FlowPanel *m_panel;
     FormHistory *m_history;
@@ -36,9 +40,6 @@ private:
     FormResult *m_result;
     FormSerial *m_serial;
     FormSetting *m_setting;
-    // QWidget interface
-    void init();
-    void setTheme();
     QThread *m_workerThread;
     ThreadWorker *m_worker;
 

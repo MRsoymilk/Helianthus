@@ -23,18 +23,18 @@ signals:
     void processSerialData(const QByteArray &data24);
     void send2PlotData(const QVector<double> &v24, const QVector<qint32> &raw24);
     void send2PlotHistory(const QList<QPointF> &v24);
+
 public slots:
     void onSerialDataReceived(const QByteArray &data24);
-
-protected:
-    void wheelEvent(QWheelEvent *event) override;
-public slots:
     void updatePlot(const QList<QPointF> &v24,
                     const double &xMin,
                     const double &xMax,
                     const double &yMin,
                     const double &yMax);
     void updateTable(const QVector<double> &v24, const QVector<qint32> &raw24);
+
+protected:
+    void wheelEvent(QWheelEvent *event) override;
 
 private slots:
     void on_tBtnZoom_clicked();
@@ -55,11 +55,9 @@ private:
     QValueAxis *m_axisY;
     double m_fixedYMin = -2.5;
     double m_fixedYMax = 2.5;
-
     bool m_autoZoom;
     bool m_showHistory;
     bool m_showData;
-
     PlotData *m_plotData;
     PlotHistory *m_plotHistory;
 };

@@ -15,12 +15,15 @@ class FormResult : public QWidget
 public:
     explicit FormResult(QWidget *parent = nullptr);
     ~FormResult();
+
 public slots:
     void showResult(RESULT result);
 
 private:
-    Ui::FormResult *ui;
     void init();
+
+private:
+    Ui::FormResult *ui;
     RESULT lastResult = RESULT::Empty;
 };
 

@@ -55,18 +55,20 @@ private slots:
     void onSerialDataClose();
 
 private:
-    Ui::FormSerial *ui;
     void init();
+    bool openSerial();
+    void closeSerial();
+    void send(const QString &text);
+
+private:
+    Ui::FormSerial *ui;
     QList<FrameType> m_frameTypes = {};
     QMap<QString, SERIAL> m_mapSerial;
-    bool openSerial();
     QSerialPort *m_serial = nullptr;
     INI_SERIAL m_ini;
     QByteArray m_buffer;
     FRAME frame;
     bool m_switch;
-    void closeSerial();
-    void send(const QString &text);
     SerialData *m_data;
     bool m_showData;
 };
