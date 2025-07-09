@@ -25,6 +25,8 @@ void PlotData::init()
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableView, &QWidget::customContextMenuRequested, this, [=](const QPoint &pos) {
         QMenu menu;
+        QAction *clearAction = menu.addAction("Clear");
+        connect(clearAction, &QAction::triggered, this, &PlotData::clearData);
         QAction *exportAction = menu.addAction("Export to CSV");
         connect(exportAction, &QAction::triggered, this, &PlotData::exportToCSV);
         QAction *exportAllAction = menu.addAction("Export All to CSV");
@@ -42,15 +44,6 @@ void PlotData::updateTable(const QVector<double> &v24, const QVector<qint32> &ra
         m_total = m_listV24.size();
         ui->labelStatus->setText(QString("%1/%2").arg(m_current).arg(m_total));
 
-        // m_model->removeRows(0, m_model->rowCount());
-
-        // int count = std::min(v24.size(), raw24.size());
-        // for (int i = 0; i < count; ++i) {
-        //     QList<QStandardItem *> row;
-        //     row << new QStandardItem(QString::number(v24[i], 'f', 6));
-        //     row << new QStandardItem(QString::number(raw24[i]));
-        //     m_model->appendRow(row);
-        // }
         fillData(v24, raw24);
     }
 }
@@ -66,6 +59,15 @@ void PlotData::fillData(const QVector<double> &v24, const QVector<qint32> &raw24
         row << new QStandardItem(QString::number(raw24[i]));
         m_model->appendRow(row);
     }
+}
+
+void PlotData::clearData()
+{
+    m_listV24.clear();
+    m_listRaw24.clear();
+    m_model->removeRows(0, m_model->rowCount());
+    m_current = m_total = 0;
+    ui->labelStatus->setText(QString("%1/%2").arg(m_current).arg(m_total));
 }
 
 void PlotData::exportToCSV()

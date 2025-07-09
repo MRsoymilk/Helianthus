@@ -34,6 +34,7 @@ private:
     void exportToCSV();
     void exportAllToCSV();
     void fillData(const QVector<double> &v24, const QVector<qint32> &raw24);
+    void clearData();
 
 private:
     int m_current = 0;
