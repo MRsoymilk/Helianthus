@@ -18,6 +18,34 @@ FormSerial::~FormSerial()
     delete ui;
 }
 
+void FormSerial::refreshSerialPorts()
+{
+    QStringList currentPorts;
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    for (const auto &port : ports) {
+        currentPorts << port.portName();
+    }
+
+    if (currentPorts != m_lastPortList) {
+        LOG_INFO("Serial ports changed: {}", currentPorts.join(", ").toStdString());
+        m_lastPortList = currentPorts;
+
+        ui->comboBoxPort->clear();
+        ui->comboBoxPort->addItems(currentPorts);
+
+        m_mapSerial.clear();
+        for (const auto &port : ports) {
+            SERIAL serial;
+            serial.SerialNumber = port.serialNumber();
+            serial.Description = port.description();
+            serial.Manufacturer = port.manufacturer();
+            serial.StandardBaudRates = port.standardBaudRates();
+            serial.SystemLocation = port.systemLocation();
+            m_mapSerial.insert(port.portName(), serial);
+        }
+    }
+}
+
 void FormSerial::init()
 {
     // init port
@@ -296,4 +324,9 @@ void FormSerial::on_tBtnData_clicked()
     } else {
         m_data->close();
     }
+}
+
+void FormSerial::on_tBtnRefresh_clicked()
+{
+    refreshSerialPorts();
 }

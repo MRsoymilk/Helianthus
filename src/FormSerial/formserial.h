@@ -55,6 +55,8 @@ private slots:
     void on_tBtnData_clicked();
     void onSerialDataClose();
 
+    void on_tBtnRefresh_clicked();
+
 private:
     void init();
     bool openSerial();
@@ -74,6 +76,8 @@ private:
     bool m_showData;
     long long m_recv_count = 0;
     void handleFrame(const QString &type, const QByteArray &data);
+    void refreshSerialPorts();
+    QStringList m_lastPortList;
 };
 
 #endif // FORMSERIAL_H
