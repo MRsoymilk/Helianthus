@@ -74,7 +74,7 @@ private:
     bool m_switch;
     SerialData *m_data;
     bool m_showData;
-    long long m_recv_count = 0;
+    long long m_recv_count;
     void handleFrame(const QString &type, const QByteArray &data);
     void refreshSerialPorts();
     QStringList m_lastPortList;

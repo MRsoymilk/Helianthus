@@ -616,5 +616,14 @@
         <file>res/page/玉米油_files/wikimedia.svg</file>
         <file>res/page/玉米油_files/wikipedia-wordmark-en.svg</file>
         <file>res/page/玉米油.html</file>
+        <file>res/icons/history.png</file>
+        <file>res/icons/lock-open.png</file>
+        <file>res/icons/lock.png</file>
+        <file>res/icons/pause.png</file>
+        <file>res/icons/plot.png</file>
+        <file>res/icons/result.png</file>
+        <file>res/icons/send.png</file>
+        <file>res/icons/serial.png</file>
+        <file>res/icons/setting.png</file>
     </qresource>
 </RCC>

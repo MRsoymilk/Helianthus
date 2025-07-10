@@ -71,10 +71,7 @@ void MainWindow::init()
 
     connect(m_panel, &FlowPanel::switchForm, this, &MainWindow::onSwitchForm);
     connect(m_panel, &FlowPanel::pinPanel, this, [&](bool isPin) {
-        if (isPin) {
-            ui->vLayPanel->addWidget(m_panel);
-        } else {
-            ui->vLayPanel->removeWidget(m_panel);
+        if (!isPin) {
             m_panel->updatePosition();
         }
     });

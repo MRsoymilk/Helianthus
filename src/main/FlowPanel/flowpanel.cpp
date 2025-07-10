@@ -18,8 +18,30 @@ FlowPanel::~FlowPanel()
 
 void FlowPanel::init()
 {
+    auto setLeftIconButton = [](QPushButton *btn) {
+        int h = btn->height();
+        btn->setIconSize(QSize(h, h));
+
+        btn->setStyleSheet(R"(
+        QPushButton {
+            text-align: left;         /* 文本靠左 */
+            padding-left: 8px;        /* 图标与边界留一点空 */
+        }
+    )");
+    };
+    setLeftIconButton(ui->btnSerial);
+    setLeftIconButton(ui->btnPlot);
+    setLeftIconButton(ui->btnResult);
+    setLeftIconButton(ui->btnHistory);
+    setLeftIconButton(ui->btnSetting);
+    ui->btnSerial->setIcon(QIcon(":/res/icons/serial.png"));
+    ui->btnPlot->setIcon(QIcon(":/res/icons/plot.png"));
+    ui->btnResult->setIcon(QIcon(":/res/icons/result.png"));
+    ui->btnHistory->setIcon(QIcon(":/res/icons/history.png"));
+    ui->btnSetting->setIcon(QIcon(":/res/icons/setting.png"));
+
     this->setObjectName("FlowPanel");
-    setAttribute(Qt::WA_StyledBackground, true); // 允许样式生效
+    setAttribute(Qt::WA_StyledBackground, true);
 
     setStyleSheet(R"(
     QWidget#FlowPanel {
@@ -47,6 +69,8 @@ void FlowPanel::init()
     QPixmap pix(":/res/icons/left.png");
     ui->labelFlowArrow->setPixmap(pix.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     ui->labelFlowArrow->setScaledContents(false);
+
+    ui->tBtnPin->setIcon(QIcon(":/res/icons/lock-open.png"));
 }
 
 void FlowPanel::enterEvent(QEnterEvent *event)
@@ -139,10 +163,15 @@ void FlowPanel::on_tBtnPin_clicked()
     emit pinPanel(m_pinned);
 
     if (m_pinned) {
-        // ui->tBtnPin->setIcon(QIcon(":/res/icons/pin_on.png"));
+        ui->tBtnPin->setIcon(QIcon(":/res/icons/lock.png"));
+        ui->labelFlowArrow->setFixedSize(24, 24);
+        QPixmap pix(":/res/icons/pause.png");
+        ui->labelFlowArrow->setPixmap(
+            pix.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        ui->labelFlowArrow->setScaledContents(false);
         animation->stop();
     } else {
-        // ui->tBtnPin->setIcon(QIcon(":/res/icons/pin_off.png"));
+        ui->tBtnPin->setIcon(QIcon(":/res/icons/lock-open.png"));
         animation->stop();
         animation->setStartValue(pos());
         animation->setEndValue(QPoint(parentWidget()->width() - m_visual_size, 0));

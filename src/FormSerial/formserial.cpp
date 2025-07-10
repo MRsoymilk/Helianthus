@@ -48,6 +48,7 @@ void FormSerial::refreshSerialPorts()
 
 void FormSerial::init()
 {
+    m_recv_count = 0;
     // init port
     QList<QSerialPortInfo> list_port = QSerialPortInfo::availablePorts();
     if (list_port.isEmpty()) {
