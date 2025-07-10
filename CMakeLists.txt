@@ -22,7 +22,8 @@ set(PROJECT_SOURCES
         src/main/FlowPanel/flowpanel.h
         src/main/FlowPanel/flowpanel.ui
         src/FormSerial/formserial.h
-        src/FormSerial/formserial.cpp src/FormSerial/formserial.ui
+        src/FormSerial/formserial.cpp
+        src/FormSerial/formserial.ui
         src/FormResult/formresult.h
         src/FormResult/formresult.cpp
         src/FormResult/formresult.ui
@@ -50,8 +51,13 @@ set(PROJECT_SOURCES
         src/FormPlot/PlotData/plotdata.cpp
         src/FormPlot/PlotData/plotdata.ui
         src/FormPlot/PlotHistory/plothistory.h
-        src/FormPlot/PlotHistory/plothistory.cpp src/FormPlot/PlotHistory/plothistory.ui
-        src/FormSerial/SerialData/serialdata.h src/FormSerial/SerialData/serialdata.cpp src/FormSerial/SerialData/serialdata.ui
+        src/FormPlot/PlotHistory/plothistory.cpp
+        src/FormPlot/PlotHistory/plothistory.ui
+        src/FormSerial/SerialData/serialdata.h
+        src/FormSerial/SerialData/serialdata.cpp
+        src/FormSerial/SerialData/serialdata.ui
+        src/components/MyHttp/myhttp.h
+        src/components/MyHttp/myhttp.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -84,6 +90,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/src/components/MyLog"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/components/MySetting"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/components/MyProcess"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/components/MyHttp"
 )
 
 target_link_libraries(Helianthus PRIVATE

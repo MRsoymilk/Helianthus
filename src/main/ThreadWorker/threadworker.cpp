@@ -6,6 +6,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include "myhttp.h"
 
 ThreadWorker::ThreadWorker(QObject *parent)
     : QObject(parent)
@@ -88,43 +89,6 @@ void ThreadWorker::processData(const QByteArray &data24)
         signalArray.append(val);
     inputObj["signal"] = signalArray;
 
-    // QJsonDocument doc(inputObj);
-    // QString jsonString = QString::fromUtf8(doc.toJson(QJsonDocument::Compact));
-
-    // QStringList args;
-    // args << "algorithm/knn_predict.py" << "--input" << jsonString;
-    // PROCESS_ARGS(
-    //     "venv/bin/python3",
-    //     args,
-    //     [&](const QString &out) {
-    //         qDebug() << "KNN output:" << out;
-
-    //         QJsonParseError err;
-    //         // {"uuid": "95618cf1-3a33-470f-a28c-ef1cc6f08ec4", "result": "\u6c34", "elapsed": 91.91101599935791}
-    //         QJsonDocument doc = QJsonDocument::fromJson(out.toUtf8(), &err);
-    //         if (err.error != QJsonParseError::NoError) {
-    //             qWarning() << "JSON parse error:" << err.errorString();
-    //             return;
-    //         }
-
-    //         QJsonObject obj = doc.object();
-    //         QString res = obj["result"].toString();
-    //         if (res == "橄榄油") {
-    //             emit classificationForResult(RESULT::OliveOil);
-    //         } else if (res == "水") {
-    //             emit classificationForResult(RESULT::Water);
-    //         } else if (res == "空") {
-    //             emit classificationForResult(RESULT::Empty);
-    //         } else if (res == "糖水") {
-    //             emit classificationForResult(RESULT::TongSui);
-    //         } else if (res == "芝麻油") {
-    //             emit classificationForResult(RESULT::SesameOil);
-    //         } else if (res == "葵花籽油") {
-    //             emit classificationForResult(RESULT::SunflowerOil);
-    //         }
-    //         emit classificationForHistory(obj);
-    //     },
-    //     [&](const QString &err) { qWarning() << "KNN script error:" << err; });
     sendPredictRequest(v_voltage24);
 }
 
@@ -136,61 +100,43 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
         signalArray.append(val);
     inputObj["signal"] = signalArray;
 
-    QNetworkRequest request(QUrl("http://192.168.123.233:5010/knn_predict"));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    MyHttp *http = new MyHttp(this);
+    QUrl url("http://192.168.123.233:5010/knn_predict");
 
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    QJsonDocument doc(inputObj);
-    QByteArray jsonData = doc.toJson(QJsonDocument::Compact);
-
-    connect(manager, &QNetworkAccessManager::finished, this, [=](QNetworkReply *reply) {
-        if (reply->error() != QNetworkReply::NoError) {
-            qWarning() << "HTTP error:" << reply->errorString();
-            reply->deleteLater();
-            manager->deleteLater();
-            return;
-        }
-
-        QByteArray responseData = reply->readAll();
-        QJsonParseError err;
-        QJsonDocument doc = QJsonDocument::fromJson(responseData, &err);
-        if (err.error != QJsonParseError::NoError) {
-            qWarning() << "JSON parse error:" << err.errorString();
-            reply->deleteLater();
-            manager->deleteLater();
-            return;
-        }
-
-        QJsonObject obj = doc.object();
+    connect(http, &MyHttp::jsonResponse, this, [=](const QJsonObject &obj) {
         QString res = obj["result"].toString();
-        if (res == "橄榄油") {
+
+        if (res == "橄榄油")
             emit classificationForResult(RESULT::OliveOil);
-        } else if (res == "水") {
+        else if (res == "水")
             emit classificationForResult(RESULT::Water);
-        } else if (res == "空") {
+        else if (res == "空")
             emit classificationForResult(RESULT::Empty);
-        } else if (res == "糖水") {
+        else if (res == "糖水")
             emit classificationForResult(RESULT::TongSui);
-        } else if (res == "芝麻油") {
+        else if (res == "芝麻油")
             emit classificationForResult(RESULT::SesameOil);
-        } else if (res == "葵花籽油") {
+        else if (res == "葵花籽油")
             emit classificationForResult(RESULT::SunflowerOil);
-        } else if (res == "75酒精") {
+        else if (res == "75酒精")
             emit classificationForResult(RESULT::Alcohol75);
-        } else if (res == "C2H4O2") {
+        else if (res == "C2H4O2")
             emit classificationForResult(RESULT::C2H4O2);
-        } else if (res == "C2H6O") {
+        else if (res == "C2H6O")
             emit classificationForResult(RESULT::C2H6O);
-        } else if (res == "玉米油") {
+        else if (res == "玉米油")
             emit classificationForResult(RESULT::CornOil);
-        } else if (res == "空瓶") {
+        else if (res == "空瓶")
             emit classificationForResult(RESULT::EmptyBottle);
-        }
 
         emit classificationForHistory(obj);
-        reply->deleteLater();
-        manager->deleteLater();
+        http->deleteLater();
     });
 
-    manager->post(request, jsonData);
+    connect(http, &MyHttp::httpError, this, [=](const QString &err) {
+        qWarning() << "HTTP error:" << err;
+        http->deleteLater();
+    });
+
+    http->postJson(url, inputObj);
 }
