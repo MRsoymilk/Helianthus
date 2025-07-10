@@ -625,5 +625,6 @@
         <file>res/icons/send.png</file>
         <file>res/icons/serial.png</file>
         <file>res/icons/setting.png</file>
+        <file>res/icons/Helianthus.png</file>
     </qresource>
 </RCC>
