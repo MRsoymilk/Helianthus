@@ -14,6 +14,16 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Charts SerialPort
 
 set(PROJECT_SOURCES
         src/global/g_define.h
+        src/components/MyLog/mylog.h
+        src/components/MyLog/mylog.cpp
+        src/components/MySetting/mysetting.h
+        src/components/MySetting/mysetting.cpp
+        src/components/MyChartView/mychartview.h
+        src/components/MyChartView/mychartview.cpp
+        src/components/MyProcess/myprocess.h
+        src/components/MyProcess/myprocess.cpp
+        src/components/MyHttp/myhttp.h
+        src/components/MyHttp/myhttp.cpp
         src/main/main.cpp
         src/main/mainwindow.cpp
         src/main/mainwindow.h
@@ -36,13 +46,6 @@ set(PROJECT_SOURCES
         src/FormSetting/formsetting.h
         src/FormSetting/formsetting.cpp
         src/FormSetting/formsetting.ui
-        src/components/MyLog/mylog.h src/components/MyLog/mylog.cpp
-        src/components/MySetting/mysetting.h
-        src/components/MySetting/mysetting.cpp
-        src/components/MyChartView/mychartview.h
-        src/components/MyChartView/mychartview.cpp
-        src/components/MyProcess/myprocess.h
-        src/components/MyProcess/myprocess.cpp
         src/FormPlot/PlotData/plotdata.h
         src/FormPlot/PlotData/plotdata.cpp
         src/main/ThreadWorker/threadworker.h
@@ -56,8 +59,6 @@ set(PROJECT_SOURCES
         src/FormSerial/SerialData/serialdata.h
         src/FormSerial/SerialData/serialdata.cpp
         src/FormSerial/SerialData/serialdata.ui
-        src/components/MyHttp/myhttp.h
-        src/components/MyHttp/myhttp.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
