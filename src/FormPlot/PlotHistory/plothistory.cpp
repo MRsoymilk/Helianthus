@@ -37,6 +37,23 @@ void PlotHistory::init()
     m_chartView = new MyChartView(m_chart, this);
     m_chartView->setRenderHint(QPainter::Antialiasing);
     ui->gLayHistoryPlot->addWidget(m_chartView);
+
+    m_chartView->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(m_chartView, &QWidget::customContextMenuRequested, this, [=](const QPoint &pos) {
+        QMenu menu(this);
+        QAction *clearAction = menu.addAction("Clear");
+        connect(clearAction, &QAction::triggered, this, &PlotHistory::clearData);
+        menu.exec(m_chartView->mapToGlobal(pos));
+    });
+}
+
+void PlotHistory::clearData()
+{
+    m_listV24.clear();
+    m_current = m_total = 0;
+    ui->labelStatus->setText(QString("%1/%2").arg(m_current).arg(m_total));
+    m_series->clear();
 }
 
 void PlotHistory::updateChart(const QList<QPointF> &v24)
@@ -70,7 +87,7 @@ void PlotHistory::fillChart(const QList<QPointF> &v24)
 
 void PlotHistory::closeEvent(QCloseEvent *event)
 {
-    m_listV24.clear();
+    clearData();
     emit plotHistoryClose();
     QWidget::closeEvent(event);
 }

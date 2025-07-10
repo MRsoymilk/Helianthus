@@ -87,6 +87,8 @@ void FormPlot::init()
     ui->stackedWidget->setCurrentWidget(m_view);
 
     ui->tBtnZoom->setChecked(m_autoZoom);
+    m_showData = false;
+    m_showHistory = false;
     ui->tBtnData->setChecked(m_showData);
     ui->tBtnHistory->setChecked(m_showHistory);
     ui->tBtnZoom->setCheckable(true);

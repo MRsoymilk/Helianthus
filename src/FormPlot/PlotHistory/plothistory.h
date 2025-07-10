@@ -33,6 +33,7 @@ private slots:
 private:
     void fillChart(const QList<QPointF> &v24);
     void init();
+    void clearData();
 
 private:
     Ui::PlotHistory *ui;
