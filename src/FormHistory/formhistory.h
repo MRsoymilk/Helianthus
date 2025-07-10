@@ -24,10 +24,6 @@ public slots:
 private:
     void initModel();
     void initFile();
-    void appendRecord(const QString &timestamp,
-                      const QString &result,
-                      const QVector<double> &voltages);
-    QString resultToString(RESULT r);
 
 private:
     Ui::FormHistory *ui;
