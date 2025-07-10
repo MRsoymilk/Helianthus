@@ -22,6 +22,7 @@ public:
         QString name;
         QByteArray header;
         QByteArray footer;
+        int length;
     };
 
     struct SERIAL
@@ -71,6 +72,8 @@ private:
     bool m_switch;
     SerialData *m_data;
     bool m_showData;
+    long long m_recv_count = 0;
+    void handleFrame(const QString &type, const QByteArray &data);
 };
 
 #endif // FORMSERIAL_H

@@ -2,6 +2,7 @@
 #include "g_define.h"
 #include "ui_formserial.h"
 
+#include <QFile>
 #include <QSerialPortInfo>
 
 FormSerial::FormSerial(QWidget *parent)
@@ -58,7 +59,7 @@ void FormSerial::init()
     });
 
     m_frameTypes = {
-        {"curve_24bit", QByteArray::fromHex("DE3A096631"), QByteArray::fromHex("CEFF")},
+        {"curve_24bit", QByteArray::fromHex("DE3A096631"), QByteArray::fromHex("CEFF"), 1990},
     };
 
     QString history_send = SETTING_CONFIG_GET(CFG_GROUP_SERIAL, CFG_HISTORY_SEND, "");
@@ -130,53 +131,69 @@ void FormSerial::send(const QString &text)
     }
 }
 
+void FormSerial::handleFrame(const QString &type, const QByteArray &data)
+{
+    if (type == "curve_24bit") {
+        emit recvSerialData(data);
+    }
+}
+
 void FormSerial::onReadyRead()
 {
     QByteArray data = m_serial->readAll();
+    m_recv_count += data.size();
+    ui->labelRecvCount->setText(QString("recv: %1").arg(m_recv_count));
+
     QString to_show = data;
     to_show.clear();
     for (int i = 0; i < data.length(); ++i) {
         to_show.append(QString("%1 ").arg((unsigned char) data[i], 2, 16, QChar('0')).toUpper());
     }
-
     ui->textBrowserRecv->append("[RX] " + to_show);
     m_buffer.append(data);
 
     while (true) {
         int firstHeaderIdx = -1;
         FrameType current_frame;
+
+        // 查找所有已知帧头
         for (const auto &type : m_frameTypes) {
             int idx = m_buffer.indexOf(type.header);
             if (idx != -1 && (firstHeaderIdx == -1 || idx < firstHeaderIdx)) {
                 firstHeaderIdx = idx;
-                current_frame.name = type.name;
-                current_frame.header = type.header;
-                current_frame.footer = type.footer;
+                current_frame = type;
             }
         }
 
+        // 没有帧头，清理或等待
         if (firstHeaderIdx == -1) {
-            if (m_buffer.size() > 1024)
+            if (m_buffer.size() > 10 * 1024) {
+                LOG_WARN("Buffer overflow, clearing");
                 m_buffer.clear();
+            }
             break;
         }
 
-        int endIdx = m_buffer.indexOf(current_frame.footer,
-                                      firstHeaderIdx + current_frame.header.size());
-        if (endIdx == -1) {
+        // 丢弃无效数据
+        if (firstHeaderIdx > 0) {
+            LOG_WARN("Dropping invalid data before header: {} bytes", firstHeaderIdx);
+            m_buffer.remove(0, firstHeaderIdx);
+        }
+
+        // 长度固定帧
+        if (m_buffer.size() < current_frame.length)
             break;
+
+        QByteArray frame_candidate = m_buffer.left(current_frame.length);
+        if (!frame_candidate.endsWith(current_frame.footer)) {
+            LOG_WARN("Invalid footer (fixed length), removing header only");
+            m_buffer.remove(0, current_frame.header.size());
+            continue;
         }
 
-        int frameLen = endIdx + current_frame.footer.size() - firstHeaderIdx;
-        QByteArray tmp_frame = m_buffer.mid(firstHeaderIdx, frameLen);
-
-        if (current_frame.name.toStdString() == "curve_24bit") {
-            LOG_INFO("Matched frame type: {}", current_frame.name.toStdString());
-            frame.bit24 = tmp_frame;
-            emit recvSerialData(frame.bit24);
-        }
-
-        m_buffer.remove(0, endIdx + current_frame.footer.size());
+        LOG_INFO("Fixed-length frame matched: {}", current_frame.name.toStdString());
+        handleFrame(current_frame.name, frame_candidate);
+        m_buffer.remove(0, current_frame.length);
     }
 }
 
