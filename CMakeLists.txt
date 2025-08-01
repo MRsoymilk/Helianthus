@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Helianthus VERSION 0.0.2 LANGUAGES CXX)
+project(Helianthus VERSION 0.0.3 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -46,6 +46,9 @@ set(PROJECT_SOURCES
         src/FormSetting/formsetting.h
         src/FormSetting/formsetting.cpp
         src/FormSetting/formsetting.ui
+        src/FormSetting/AutoUpdate/autoupdate.h
+        src/FormSetting/AutoUpdate/autoupdate.cpp
+        src/FormSetting/AutoUpdate/autoupdate.ui
         src/FormPlot/PlotData/plotdata.h
         src/FormPlot/PlotData/plotdata.cpp
         src/main/ThreadWorker/threadworker.h
@@ -135,13 +138,4 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/version.h
 )
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-if (WIN32)
-    set(APP_ICON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/res/icons/Helianthus.ico")
-
-    set(APP_ICON_RC "${CMAKE_CURRENT_BINARY_DIR}/app_icon.rc")
-    file(WRITE ${APP_ICON_RC} "IDI_ICON1 ICON \"${APP_ICON_PATH}\"\n")
-
-    target_sources(${PROJECT_NAME} PRIVATE ${APP_ICON_RC})
-endif()
 

@@ -30,6 +30,9 @@ const QString CFG_HISTORY_SEND = "history_send";
 const QString CFG_GROUP_PROGRAM = "Program";
 const QString CFG_PROGRAM_THEME = "theme";
 
+const QString CFG_GROUP_AUTOUPDATE = "AutoUpdate";
+const QString CFG_AUTOUPDATE_URL = "url";
+
 #include <QDateTime>
 #define TIMESTAMP_0() (QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))
 #define TIMESTAMP_1(format) (QDateTime::currentDateTime().toString(format))

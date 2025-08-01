@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AutoUpdate</class>
+ <widget class="QWidget" name="AutoUpdate">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>719</width>
+    <height>457</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelURL">
+     <property name="text">
+      <string>URL</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="4">
+    <widget class="QLineEdit" name="lineEditURL"/>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="labelCurrentVersion">
+     <property name="text">
+      <string>Current Version</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLineEdit" name="lineEditCurrentVersion"/>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLabel" name="labelTargetVersion">
+     <property name="text">
+      <string>Target Version</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QLineEdit" name="lineEditTargetVersion"/>
+   </item>
+   <item row="2" column="0" colspan="5">
+    <widget class="QTextBrowser" name="textBrowser"/>
+   </item>
+   <item row="3" column="0" colspan="5">
+    <widget class="QPushButton" name="btnUpdate">
+     <property name="text">
+      <string>Update</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="5">
+    <widget class="QProgressBar" name="progressBar">
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
