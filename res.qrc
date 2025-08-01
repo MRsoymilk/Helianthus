@@ -56,10 +56,8 @@
         <file>res/page/Bottle_files/websitetranslationui_data/googlelogo_clr_74x24px.svg</file>
         <file>res/page/Bottle_files/websitetranslationui_data/m=_b,_tp.js</file>
         <file>res/page/Bottle_files/120px-Bocksbeutel_bottle.jpg</file>
-        <file>res/page/Bottle_files/120px-Bouteilles_de_vin_Voleuses-détourées.jpg</file>
         <file>res/page/Bottle_files/120px-Normflasche-1.jpg</file>
         <file>res/page/Bottle_files/120px-Shampoo_Bottle_made_of_PLA-Blend_Bio-Flex.jpg</file>
-        <file>res/page/Bottle_files/120px-Wärmflasche1.jpg</file>
         <file>res/page/Bottle_files/22872c3aebc44ba42e27b5f1bb568448_(17921561302).jpg</file>
         <file>res/page/Bottle_files/22872c3aebc44ba42e27b5f1bb568448_(17921561302)_002.jpg</file>
         <file>res/page/Bottle_files/24px.svg</file>
@@ -67,7 +65,6 @@
         <file>res/page/Bottle_files/250px-Bottle_Iran_16.JPG</file>
         <file>res/page/Bottle_files/250px-Bouteilles_de_vin_Voleuses-détourées.jpg</file>
         <file>res/page/Bottle_files/250px-Normflasche-1.jpg</file>
-        <file>res/page/Bottle_files/250px-Wärmflasche1.jpg</file>
         <file>res/page/Bottle_files/330px-Bottle_Iran_16.jpg</file>
         <file>res/page/Bottle_files/330px-Bouteille.jpg</file>
         <file>res/page/Bottle_files/380px-Bottle_Iran_16.jpg</file>
@@ -76,7 +73,6 @@
         <file>res/page/Bottle_files/Beer_bottles_2018_G1.jpg</file>
         <file>res/page/Bottle_files/Beer_bottles_2018_G1_002.jpg</file>
         <file>res/page/Bottle_files/Botella_de_pl%C3%A1stico_-_PET_002.jpg</file>
-        <file>res/page/Bottle_files/Botella_de_plástico_-_PET.jpg</file>
         <file>res/page/Bottle_files/Bottle,_Ding_ware,_Hebei_province,_China,_Northern_Song__002.jpg</file>
         <file>res/page/Bottle_files/Bottle,_Ding_ware,_Hebei_province,_China,_Northern_Song_dyna.jpg</file>
         <file>res/page/Bottle_files/Bottle_from_Shiraz,_Iran,_Qajar_period,_late_18th-19th_c_002.JPG</file>
@@ -110,7 +106,6 @@
         <file>res/page/Bottle_files/My_dna_fragrance_exclusive_perfume-2_002.jpg</file>
         <file>res/page/Bottle_files/poweredby_mediawiki.svg</file>
         <file>res/page/Bottle_files/R%C3%A1k%C3%B3czi-Bolzano-Kissingen-1_002.JPG</file>
-        <file>res/page/Bottle_files/Rákóczi-Bolzano-Kissingen-1.JPG</file>
         <file>res/page/Bottle_files/Shampoo_Bottle_made_of_PLA-Blend_Bio-Flex.jpg</file>
         <file>res/page/Bottle_files/Sigg_Bottle.jpg</file>
         <file>res/page/Bottle_files/Sigg_Bottle_002.jpg</file>
@@ -415,7 +410,6 @@
         <file>res/page/Sodium_bicarbonate_files/donate.gif</file>
         <file>res/page/Sodium_bicarbonate_files/donate.png</file>
         <file>res/page/Sodium_bicarbonate_files/Hydrogenuhli%C4%8Ditan_sodn%C3%BD_002.jpg</file>
-        <file>res/page/Sodium_bicarbonate_files/Hydrogenuhličitan_sodný.jpg</file>
         <file>res/page/Sodium_bicarbonate_files/lazy.min.js</file>
         <file>res/page/Sodium_bicarbonate_files/load.css</file>
         <file>res/page/Sodium_bicarbonate_files/load.js</file>
@@ -510,13 +504,11 @@
         <file>res/page/Starch_files/OOjs_UI_icon_edit-ltr-progressive.svg.webp</file>
         <file>res/page/Starch_files/poweredby_mediawiki.svg</file>
         <file>res/page/Starch_files/Projet_bi%C3%A8re_logo_v2_002.png</file>
-        <file>res/page/Starch_files/Projet_bière_logo_v2.png</file>
         <file>res/page/Starch_files/St%C3%A4rkemehl_800_fach_Polfilter_002.jpg</file>
         <file>res/page/Starch_files/Starch_Granules_in_Endosperm_of_Zea_Mays_Embryo_by_Phase_002.jpg</file>
         <file>res/page/Starch_files/Starch_Granules_in_Endosperm_of_Zea_Mays_Embryo_by_Phase_Con.jpg</file>
         <file>res/page/Starch_files/Starch_granules_of_potato02.jpg</file>
         <file>res/page/Starch_files/Starch_granules_of_potato02_002.jpg</file>
-        <file>res/page/Starch_files/Stärkemehl_800_fach_Polfilter.jpg</file>
         <file>res/page/Starch_files/websitetranslationui.html</file>
         <file>res/page/Starch_files/Wheat_starch_granules.JPG</file>
         <file>res/page/Starch_files/Wheat_starch_granules_002.JPG</file>
@@ -917,7 +909,6 @@
         <file>res/page/Alcoholic_beverage_files/Commons-logo.svg.webp</file>
         <file>res/page/Alcoholic_beverage_files/Commons-logo.svg_002.webp</file>
         <file>res/page/Alcoholic_beverage_files/css2.css</file>
-        <file>res/page/Alcoholic_beverage_files/Cérémonies_coutumières.jpg</file>
         <file>res/page/Alcoholic_beverage_files/donate.gif</file>
         <file>res/page/Alcoholic_beverage_files/donate.png</file>
         <file>res/page/Alcoholic_beverage_files/Flessen_drank.jpg</file>
@@ -945,14 +936,12 @@
         <file>res/page/Alcoholic_beverage_files/mediawiki_compact.svg</file>
         <file>res/page/Alcoholic_beverage_files/poweredby_mediawiki.svg</file>
         <file>res/page/Alcoholic_beverage_files/Projet_bi%C3%A8re_logo_v2_002.png</file>
-        <file>res/page/Alcoholic_beverage_files/Projet_bière_logo_v2.png</file>
         <file>res/page/Alcoholic_beverage_files/R%C3%A9duction_du_vin_rouge_002.jpg</file>
         <file>res/page/Alcoholic_beverage_files/Red_and_white_wine_12-2015.jpg</file>
         <file>res/page/Alcoholic_beverage_files/Red_and_white_wine_12-2015_002.jpg</file>
         <file>res/page/Alcoholic_beverage_files/Red_and_white_wine_12-2015_003.jpg</file>
         <file>res/page/Alcoholic_beverage_files/Rum_display_in_liquor_store.jpg</file>
         <file>res/page/Alcoholic_beverage_files/Rum_display_in_liquor_store_002.jpg</file>
-        <file>res/page/Alcoholic_beverage_files/Réduction_du_vin_rouge.jpg</file>
         <file>res/page/Alcoholic_beverage_files/US_Navy_100912-M-2275H-196_A_command_chaplain_holds_chur_002.jpg</file>
         <file>res/page/Alcoholic_beverage_files/US_Navy_100912-M-2275H-196_A_command_chaplain_holds_church_s.jpg</file>
         <file>res/page/Alcoholic_beverage_files/websitetranslationui.html</file>
