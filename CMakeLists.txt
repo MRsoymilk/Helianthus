@@ -129,3 +129,10 @@ endif()
 
 add_subdirectory(vendor/spdlog-1.15.0/)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/version.h
+)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
