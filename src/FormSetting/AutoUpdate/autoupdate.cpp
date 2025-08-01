@@ -99,6 +99,7 @@ void AutoUpdate::showEvent(QShowEvent *event)
     ui->progressBar->setVisible(false);
 
     ui->lineEditURL->setText(QString("%1/%2").arg(res["url"].toString(), res["file"].toString()));
+    ui->textBrowser->setText(res["description"].toString());
     ui->lineEditTargetVersion->setText(res["version"].toString());
     ui->lineEditCurrentVersion->setText(APP_VERSION);
 }
