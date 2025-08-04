@@ -30,6 +30,12 @@ const QString CFG_HISTORY_SEND = "history_send";
 const QString CFG_GROUP_PROGRAM = "Program";
 const QString CFG_PROGRAM_THEME = "theme";
 
+const QString CFG_GROUP_FRAME = "Frame";
+const QString CFG_FRAME_NAME = "name";
+const QString CFG_FRAME_HEAD = "head";
+const QString CFG_FRAME_FOOT = "foot";
+const QString CFG_FRAME_LENGTH = "length";
+
 const QString CFG_GROUP_AUTOUPDATE = "AutoUpdate";
 const QString CFG_AUTOUPDATE_URL = "url";
 

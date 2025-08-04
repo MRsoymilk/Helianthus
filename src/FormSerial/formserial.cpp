@@ -87,8 +87,21 @@ void FormSerial::init()
         }
     });
 
+    QString frame_name = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_NAME, "curve_24bit");
+    QString frame_head = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_HEAD, "DE3A096631");
+    QString frame_foot = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_FOOT, "CEFF");
+    int frame_length = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_LENGTH, "1990").toInt();
+    LOG_INFO("frame: {} head: {} - foot: {}, length: {}",
+             frame_name,
+             frame_head,
+             frame_foot,
+             frame_length);
     m_frameTypes = {
-        {"curve_24bit", QByteArray::fromHex("DE3A096631"), QByteArray::fromHex("CEFF"), 1990},
+        {frame_name,
+         QByteArray::fromHex(frame_head.toLocal8Bit()),
+         QByteArray::fromHex(frame_foot.toLocal8Bit()),
+         frame_length},
+
     };
 
     QString history_send = SETTING_CONFIG_GET(CFG_GROUP_SERIAL, CFG_HISTORY_SEND, "");
@@ -162,9 +175,9 @@ void FormSerial::send(const QString &text)
 
 void FormSerial::handleFrame(const QString &type, const QByteArray &data)
 {
-    if (type == "curve_24bit") {
-        emit recvSerialData(data);
-    }
+    // if (type == "curve_24bit") {
+    emit recvSerialData(data);
+    // }
 }
 
 void FormSerial::onReadyRead()
