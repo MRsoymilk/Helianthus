@@ -39,6 +39,10 @@ const QString CFG_FRAME_LENGTH = "length";
 const QString CFG_GROUP_AUTOUPDATE = "AutoUpdate";
 const QString CFG_AUTOUPDATE_URL = "url";
 
+const QString CFG_GROUP_HISTORY = "History";
+const QString CFG_HISTORY_MULT = "mult";
+const QString CFG_HISTORY_CMD = "cmd";
+
 #include <QDateTime>
 #define TIMESTAMP_0() (QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))
 #define TIMESTAMP_1(format) (QDateTime::currentDateTime().toString(format))
@@ -93,6 +97,9 @@ const QString CFG_AUTOUPDATE_URL = "url";
             }); \
         }); \
     } while (0)
+
+const QString TITLE_INFO = "info";
+const QString TITLE_WARNING = "warning";
 
 #include "myprocess.h"
 #define PROCESS(cmd, onSuccess, onError) \

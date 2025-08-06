@@ -4,6 +4,7 @@
 #include <QWidget>
 
 class AutoUpdate;
+class SerialFrame;
 
 namespace Ui {
 class FormSetting;
@@ -23,6 +24,7 @@ private:
 private:
     Ui::FormSetting *ui;
     AutoUpdate *m_update;
+    SerialFrame *m_frame;
 };
 
 #endif // FORMSETTING_H

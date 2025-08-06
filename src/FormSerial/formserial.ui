@@ -27,6 +27,13 @@
       <string>Config</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
+      <item row="2" column="0">
+       <widget class="QToolButton" name="tBtnRefresh">
+        <property name="text">
+         <string>refresh</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <layout class="QFormLayout" name="formLayout">
         <item row="0" column="0">
@@ -88,13 +95,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QToolButton" name="tBtnRefresh">
-        <property name="text">
-         <string>refresh</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -117,6 +117,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="tBtnIntegration">
+          <property name="text">
+           <string>integration</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="tBtnData">
           <property name="text">
            <string>data</string>
@@ -133,9 +140,115 @@
      <property name="title">
       <string>Send</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout_2" columnstretch="0">
       <item row="0" column="0">
-       <widget class="QTextEdit" name="textEditSend"/>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tabSingle">
+         <attribute name="title">
+          <string>Single</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
+           <widget class="QTextEdit" name="textEditSend"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tabMultipe">
+         <attribute name="title">
+          <string>Multipe</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_6" columnstretch="2,8">
+          <item row="3" column="1">
+           <layout class="QHBoxLayout" name="hLay3">
+            <item>
+             <widget class="QLineEdit" name="lineEditCmd3"/>
+            </item>
+            <item>
+             <widget class="QToolButton" name="tBtn3">
+              <property name="text">
+               <string>3</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLineEdit" name="lineEditPrompt3"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLineEdit" name="lineEditPrompt1"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLineEdit" name="lineEditPrompt2"/>
+          </item>
+          <item row="4" column="1">
+           <layout class="QHBoxLayout" name="hLay4">
+            <item>
+             <widget class="QLineEdit" name="lineEditCmd4"/>
+            </item>
+            <item>
+             <widget class="QToolButton" name="tBtn4">
+              <property name="text">
+               <string>4</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLineEdit" name="lineEditPrompt4"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="lineEditPrompt0"/>
+          </item>
+          <item row="0" column="1">
+           <layout class="QHBoxLayout" name="hLay0">
+            <item>
+             <widget class="QLineEdit" name="lineEditCmd0"/>
+            </item>
+            <item>
+             <widget class="QToolButton" name="tBtn0">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="hLay1">
+            <item>
+             <widget class="QLineEdit" name="lineEditCmd1"/>
+            </item>
+            <item>
+             <widget class="QToolButton" name="tBtn1">
+              <property name="text">
+               <string>1</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="1">
+           <layout class="QHBoxLayout" name="hLay2">
+            <item>
+             <widget class="QLineEdit" name="lineEditCmd2"/>
+            </item>
+            <item>
+             <widget class="QToolButton" name="tBtn2">
+              <property name="text">
+               <string>2</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </widget>
       </item>
      </layout>
     </widget>

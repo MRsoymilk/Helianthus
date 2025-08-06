@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>170</width>
+    <width>250</width>
     <height>518</height>
    </rect>
   </property>
@@ -20,13 +20,6 @@
    <property name="leftMargin">
     <number>0</number>
    </property>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="btnResult">
-     <property name="text">
-      <string>Result</string>
-     </property>
-    </widget>
-   </item>
    <item row="6" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -50,13 +43,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="btnPlot">
-     <property name="text">
-      <string>Plot</string>
-     </property>
-    </widget>
    </item>
    <item row="0" column="0" rowspan="7">
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -95,10 +81,31 @@
      </item>
     </layout>
    </item>
+   <item row="5" column="1">
+    <widget class="QPushButton" name="btnSetting">
+     <property name="text">
+      <string>Setting</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="btnResult">
+     <property name="text">
+      <string>Result</string>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="1">
     <widget class="QPushButton" name="btnHistory">
      <property name="text">
       <string>History</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="btnPlot">
+     <property name="text">
+      <string>Plot</string>
      </property>
     </widget>
    </item>
@@ -121,13 +128,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="5" column="1">
-    <widget class="QPushButton" name="btnSetting">
-     <property name="text">
-      <string>Setting</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

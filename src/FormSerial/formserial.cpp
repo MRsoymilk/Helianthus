@@ -1,5 +1,6 @@
 #include "formserial.h"
 #include "g_define.h"
+#include "integration.h"
 #include "ui_formserial.h"
 
 #include <QFile>
@@ -42,6 +43,61 @@ void FormSerial::refreshSerialPorts()
             serial.StandardBaudRates = port.standardBaudRates();
             serial.SystemLocation = port.systemLocation();
             m_mapSerial.insert(port.portName(), serial);
+        }
+    }
+}
+
+void FormSerial::initMultipe()
+{
+    QStringList cmds;
+    for (int i = 0; i < 5; ++i) {
+        cmds.push_back(
+            SETTING_CONFIG_GET(CFG_GROUP_HISTORY, QString("%1_%2").arg(CFG_HISTORY_MULT).arg(i)));
+    }
+    for (int i = 0; i < 5; ++i) {
+        QString lineEditName = QString("lineEditCmd%1").arg(i);
+        QLineEdit *lineEdit = findChild<QLineEdit *>(lineEditName);
+        if (lineEdit) {
+            lineEdit->setText(cmds.at(i));
+            connect(lineEdit, &QLineEdit::editingFinished, this, [this, lineEdit, i, &cmds]() {
+                SETTING_CONFIG_SET(CFG_GROUP_HISTORY,
+                                   QString("%1_%2").arg(CFG_HISTORY_MULT).arg(i),
+                                   lineEdit->text());
+            });
+        }
+    }
+
+    QStringList labels;
+    for (int i = 0; i < 5; ++i) {
+        labels.push_back(SETTING_CONFIG_GET(CFG_GROUP_HISTORY,
+                                            QString("%1_%2").arg(CFG_HISTORY_CMD).arg(i),
+                                            QString("cmd_%1").arg(i)));
+    }
+
+    for (int i = 0; i < 5; ++i) {
+        QString lineEditName = QString("lineEditPrompt%1").arg(i);
+        QLineEdit *lineEdit = findChild<QLineEdit *>(lineEditName);
+        if (lineEdit) {
+            lineEdit->setPlaceholderText(labels.at(i));
+            connect(lineEdit, &QLineEdit::editingFinished, this, [this, lineEdit, i]() {
+                SETTING_CONFIG_SET(CFG_GROUP_HISTORY,
+                                   QString("%1_%2").arg(CFG_HISTORY_CMD).arg(i),
+                                   lineEdit->text());
+            });
+        }
+    }
+
+    for (int i = 0; i < 5; ++i) {
+        QString tBtnName = QString("tBtn%1").arg(i);
+        QToolButton *tBtn = findChild<QToolButton *>(tBtnName);
+        if (tBtn) {
+            connect(tBtn, &QToolButton::clicked, this, [this, tBtn, i]() {
+                QLineEdit *lineEdit = findChild<QLineEdit *>(QString("lineEditCmd%1").arg(i));
+                QString text = lineEdit->text().trimmed();
+                if (!text.isEmpty()) {
+                    send(text);
+                }
+            });
         }
     }
 }
@@ -90,7 +146,7 @@ void FormSerial::init()
     QString frame_name = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_NAME, "curve_24bit");
     QString frame_head = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_HEAD, "DE3A096631");
     QString frame_foot = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_FOOT, "CEFF");
-    int frame_length = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_LENGTH, "1990").toInt();
+    int frame_length = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_LENGTH, "1612").toInt();
     LOG_INFO("frame: {} head: {} - foot: {}, length: {}",
              frame_name,
              frame_head,
@@ -126,6 +182,7 @@ void FormSerial::init()
     ui->tBtnData->setChecked(m_showData);
     connect(m_data, &SerialData::serialDataClose, this, &FormSerial::onSerialDataClose);
     connect(this, &FormSerial::recvSerialData, m_data, &SerialData::onSerialDataReceive);
+    initMultipe();
 }
 
 void FormSerial::send(const QString &text)
@@ -175,9 +232,9 @@ void FormSerial::send(const QString &text)
 
 void FormSerial::handleFrame(const QString &type, const QByteArray &data)
 {
-    // if (type == "curve_24bit") {
-    emit recvSerialData(data);
-    // }
+    if (type == "curve_24bit") {
+        emit recvSerialData(data);
+    }
 }
 
 void FormSerial::onReadyRead()
@@ -318,10 +375,28 @@ void FormSerial::closeSerial()
 
 void FormSerial::on_btnSend_clicked()
 {
-    QString text = ui->textEditSend->toPlainText().trimmed();
-    LOG_INFO("serial send: {}", text);
-    send(text);
-    SETTING_CONFIG_SET(CFG_GROUP_SERIAL, CFG_HISTORY_SEND, text);
+    if (ui->tabWidget->currentWidget() == ui->tabSingle) {
+        QString text = ui->textEditSend->toPlainText().trimmed();
+        LOG_INFO("serial send: {}", text);
+        send(text);
+        SETTING_CONFIG_SET(CFG_GROUP_SERIAL, CFG_HISTORY_SEND, text);
+    } else if (ui->tabWidget->currentWidget() == ui->tabMultipe) {
+        QStringList cmds;
+        for (int i = 0; i < 5; ++i) {
+            QString lineEditName = QString("lineEditCmd%1").arg(i);
+            QLineEdit *lineEdit = findChild<QLineEdit *>(lineEditName);
+            if (lineEdit) {
+                QString txt = lineEdit->text();
+                if (!txt.isEmpty()) {
+                    cmds.push_back(txt);
+                }
+            }
+        }
+        for (const QString &cmd : cmds) {
+            LOG_INFO("serial send: {}", cmd);
+            send(cmd);
+        }
+    }
 }
 
 void FormSerial::onSerialDataClose()
@@ -343,4 +418,10 @@ void FormSerial::on_tBtnData_clicked()
 void FormSerial::on_tBtnRefresh_clicked()
 {
     refreshSerialPorts();
+}
+
+void FormSerial::on_tBtnIntegration_clicked()
+{
+    Integration *integration = new Integration;
+    integration->show();
 }

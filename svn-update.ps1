@@ -1,1 +1,0 @@
-git -C "D:\work\project\helianthus" pull

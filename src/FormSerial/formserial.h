@@ -57,8 +57,11 @@ private slots:
 
     void on_tBtnRefresh_clicked();
 
+    void on_tBtnIntegration_clicked();
+
 private:
     void init();
+    void initMultipe();
     bool openSerial();
     void closeSerial();
     void send(const QString &text);

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Helianthus VERSION 0.0.4 LANGUAGES CXX)
+project(Helianthus VERSION 0.0.5 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -49,6 +49,9 @@ set(PROJECT_SOURCES
         src/FormSetting/AutoUpdate/autoupdate.h
         src/FormSetting/AutoUpdate/autoupdate.cpp
         src/FormSetting/AutoUpdate/autoupdate.ui
+        src/FormSetting/SerialFrame/serialframe.h
+        src/FormSetting/SerialFrame/serialframe.cpp
+        src/FormSetting/SerialFrame/serialframe.ui
         src/FormPlot/PlotData/plotdata.h
         src/FormPlot/PlotData/plotdata.cpp
         src/main/ThreadWorker/threadworker.h
@@ -62,6 +65,9 @@ set(PROJECT_SOURCES
         src/FormSerial/SerialData/serialdata.h
         src/FormSerial/SerialData/serialdata.cpp
         src/FormSerial/SerialData/serialdata.ui
+        src/tools/Integration/integration.h
+        src/tools/Integration/integration.cpp
+        src/tools/Integration/integration.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -95,6 +101,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/src/components/MySetting"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/components/MyProcess"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/components/MyHttp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/tools/Integration"
 )
 
 target_link_libraries(Helianthus PRIVATE
