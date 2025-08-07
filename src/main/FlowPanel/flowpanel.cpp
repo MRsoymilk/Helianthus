@@ -30,11 +30,13 @@ void FlowPanel::init()
     )");
     };
     setLeftIconButton(ui->btnSerial);
+    setLeftIconButton(ui->btnOTO);
     setLeftIconButton(ui->btnPlot);
     setLeftIconButton(ui->btnResult);
     setLeftIconButton(ui->btnHistory);
     setLeftIconButton(ui->btnSetting);
     ui->btnSerial->setIcon(QIcon(":/res/icons/serial.png"));
+    ui->btnOTO->setIcon(QIcon(":/res/icons/interface.png"));
     ui->btnPlot->setIcon(QIcon(":/res/icons/plot.png"));
     ui->btnResult->setIcon(QIcon(":/res/icons/result.png"));
     ui->btnHistory->setIcon(QIcon(":/res/icons/history.png"));
@@ -134,6 +136,11 @@ void FlowPanel::FlowPanel::updatePosition()
 void FlowPanel::on_btnSerial_clicked()
 {
     emit switchForm(FORM::SERIAL);
+}
+
+void FlowPanel::on_btnOTO_clicked()
+{
+    emit switchForm(FORM::OTO);
 }
 
 void FlowPanel::on_btnResult_clicked()

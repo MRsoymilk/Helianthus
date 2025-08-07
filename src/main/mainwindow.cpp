@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "../FormHistory/formhistory.h"
+#include "../FormOTO/formoto.h"
 #include "../FormPlot/formplot.h"
 #include "../FormResult/formresult.h"
 #include "../FormSerial/formserial.h"
@@ -34,9 +35,11 @@ void MainWindow::init()
     m_plot = new FormPlot;
     m_result = new FormResult;
     m_serial = new FormSerial;
+    m_oto = new FormOTO;
     m_setting = new FormSetting;
 
     ui->stackedWidget->addWidget(m_serial);
+    ui->stackedWidget->addWidget(m_oto);
     ui->stackedWidget->addWidget(m_result);
     ui->stackedWidget->addWidget(m_plot);
     ui->stackedWidget->addWidget(m_history);
@@ -66,6 +69,8 @@ void MainWindow::init()
             m_history,
             &FormHistory::recordHistory,
             Qt::QueuedConnection);
+    connect(m_oto, &FormOTO::otoRequest, m_worker, &ThreadWorker::onOtoRequest);
+    connect(m_worker, &ThreadWorker::otoRequestRaw, m_oto, &FormOTO::onOtoRequestRaw);
 
     m_workerThread->start();
 
@@ -77,10 +82,12 @@ void MainWindow::init()
     });
 
     QShortcut *shortcut_Serial = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_1), this);
-    QShortcut *shortcut_Result = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_2), this);
-    QShortcut *shortcut_Plot = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_3), this);
-    QShortcut *shortcut_History = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_4), this);
+    QShortcut *shortcut_OTO = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_2), this);
+    QShortcut *shortcut_Result = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_3), this);
+    QShortcut *shortcut_Plot = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_4), this);
+    QShortcut *shortcut_History = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_5), this);
     connect(shortcut_Serial, &QShortcut::activated, this, [this]() { onSwitchForm(FORM::SERIAL); });
+    connect(shortcut_OTO, &QShortcut::activated, this, [this]() { onSwitchForm(FORM::OTO); });
     connect(shortcut_Result, &QShortcut::activated, this, [this]() { onSwitchForm(FORM::RESULT); });
     connect(shortcut_Plot, &QShortcut::activated, this, [this]() { onSwitchForm(FORM::PLOT); });
     connect(shortcut_History, &QShortcut::activated, this, [this]() {
@@ -125,6 +132,9 @@ void MainWindow::onSwitchForm(FORM f)
         break;
     case FORM::SETTING:
         ui->stackedWidget->setCurrentWidget(m_setting);
+        break;
+    case FORM::OTO:
+        ui->stackedWidget->setCurrentWidget(m_oto);
         break;
     }
 }

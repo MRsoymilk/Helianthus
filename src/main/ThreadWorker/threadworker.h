@@ -13,7 +13,7 @@ public:
 
 public slots:
     void processData(const QByteArray &data24);
-
+    void onOtoRequest(bool going, const QString &url);
 signals:
     void dataForTableReady(const QVector<double> &v24, const QVector<qint32> &raw24);
     void dataForPlotReady(const QList<QPointF> &v24,
@@ -23,6 +23,7 @@ signals:
                           const double &yMax);
     void classificationForResult(RESULT result);
     void classificationForHistory(const QJsonObject &obj);
+    void otoRequestRaw(const QJsonObject &obj);
 
 private:
     void processCurve24(const QByteArray &data24,
@@ -31,6 +32,10 @@ private:
                         double &yMin,
                         double &yMax);
     void sendPredictRequest(const QVector<double> &v_voltage24);
+    void otoRequest();
+
+    QTimer *m_timer;
+    QString m_url;
 };
 
 #endif // THREADWORKER_H

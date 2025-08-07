@@ -960,5 +960,6 @@
         <file>res/page/Alcoholic_beverage.html</file>
         <file>res/page/Empty.html</file>
         <file>res/icons/Helianthus.ico</file>
+        <file>res/icons/interface.png</file>
     </qresource>
 </RCC>

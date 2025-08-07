@@ -10,7 +10,10 @@
 
 ThreadWorker::ThreadWorker(QObject *parent)
     : QObject(parent)
-{}
+{
+    m_timer = new QTimer(this);
+    connect(m_timer, &QTimer::timeout, this, &ThreadWorker::otoRequest);
+}
 
 ThreadWorker::~ThreadWorker() {}
 
@@ -90,6 +93,53 @@ void ThreadWorker::processData(const QByteArray &data24)
     inputObj["signal"] = signalArray;
 
     sendPredictRequest(v_voltage24);
+}
+
+void ThreadWorker::onOtoRequest(bool going, const QString &url)
+{
+    if (going) {
+        m_url = url;
+        m_timer->start(100);
+    } else {
+        m_timer->stop();
+    }
+}
+
+void ThreadWorker::otoRequest()
+{
+    MyHttp *http = new MyHttp(this);
+    QJsonObject obj = http->get_sync(m_url);
+    emit otoRequestRaw(obj);
+
+    QJsonArray arr = obj["spectrum"].toArray();
+
+    double yMin = std::numeric_limits<double>::max();
+    double yMax = std::numeric_limits<double>::lowest();
+    double xMin = std::numeric_limits<double>::max();
+    double xMax = std::numeric_limits<double>::lowest();
+    QList<QPointF> out24;
+    QVector<double> v_voltage24;
+    QVector<qint32> raw24;
+
+    for (const QJsonValue &value : arr) {
+        if (value.isObject()) {
+            QJsonObject item = value.toObject();
+            for (auto it = item.begin(); it != item.end(); ++it) {
+                double wavelength = it.key().toDouble();
+                double intensity = it.value().toDouble();
+                out24.push_back({wavelength, intensity});
+                xMin = std::min(xMin, wavelength);
+                xMax = std::max(xMax, wavelength);
+                yMin = std::min(yMin, intensity);
+                yMax = std::max(yMax, intensity);
+                v_voltage24.push_back(intensity);
+                raw24.push_back(0);
+            }
+        }
+    }
+
+    emit dataForTableReady(v_voltage24, raw24);
+    emit dataForPlotReady(out24, xMin, xMax, yMin, yMax);
 }
 
 void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)

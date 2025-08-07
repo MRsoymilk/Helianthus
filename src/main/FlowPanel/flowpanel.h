@@ -32,6 +32,7 @@ public slots:
 
 private slots:
     void on_btnSerial_clicked();
+    void on_btnOTO_clicked();
     void on_btnResult_clicked();
     void on_btnPlot_clicked();
     void on_btnHistory_clicked();

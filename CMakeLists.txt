@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Helianthus VERSION 0.0.5 LANGUAGES CXX)
+project(Helianthus VERSION 0.0.6 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -65,6 +65,9 @@ set(PROJECT_SOURCES
         src/FormSerial/SerialData/serialdata.h
         src/FormSerial/SerialData/serialdata.cpp
         src/FormSerial/SerialData/serialdata.ui
+        src/FormOTO/formoto.h
+        src/FormOTO/formoto.cpp
+        src/FormOTO/formoto.ui
         src/tools/Integration/integration.h
         src/tools/Integration/integration.cpp
         src/tools/Integration/integration.ui

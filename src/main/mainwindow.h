@@ -14,6 +14,7 @@ class FormHistory;
 class FormPlot;
 class FormResult;
 class FormSerial;
+class FormOTO;
 class FormSetting;
 class ThreadWorker;
 
@@ -39,6 +40,7 @@ private:
     FormPlot *m_plot;
     FormResult *m_result;
     FormSerial *m_serial;
+    FormOTO *m_oto;
     FormSetting *m_setting;
     QThread *m_workerThread;
     ThreadWorker *m_worker;

@@ -3,7 +3,7 @@
 
 #include <QString>
 
-enum class FORM { SERIAL = 0, RESULT, PLOT, HISTORY, SETTING };
+enum class FORM { SERIAL = 0, OTO, RESULT, PLOT, HISTORY, SETTING };
 enum class RESULT {
     Empty = 0,
     Starch,
@@ -42,6 +42,13 @@ const QString CFG_AUTOUPDATE_URL = "url";
 const QString CFG_GROUP_HISTORY = "History";
 const QString CFG_HISTORY_MULT = "mult";
 const QString CFG_HISTORY_CMD = "cmd";
+
+const QString CFG_GROUP_OTO = "OTO";
+const QString CFG_OTO_INFO = "info";
+const QString CFG_OTO_SPECTRUM = "spectrum";
+
+const QString VAL_ENABLE = "enalbe";
+const QString VAL_DISABLE = "disable";
 
 #include <QDateTime>
 #define TIMESTAMP_0() (QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"))
