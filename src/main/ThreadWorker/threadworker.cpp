@@ -158,28 +158,39 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
 
     connect(http, &MyHttp::jsonResponse, this, [=](const QJsonObject &obj) {
         QString res = obj["result"].toString();
-        if (res == "橄榄油")
-            emit classificationForResult(RESULT::OliveOil);
-        else if (res == "水")
-            emit classificationForResult(RESULT::Water);
-        else if (res == "空")
+        if (res == "空") {
             emit classificationForResult(RESULT::Empty);
-        else if (res == "糖水")
+        } else if (res == "淀粉") {
+            emit classificationForResult(RESULT::Starch);
+        } else if (res == "糖") {
+            emit classificationForResult(RESULT::Sugar);
+        } else if (res == "盐") {
+            emit classificationForResult(RESULT::Salt);
+        } else if (res == "小苏打") {
+            emit classificationForResult(RESULT::SodiumBicarbonate);
+        } else if (res == "洗衣粉") {
+            emit classificationForResult(RESULT::WashingPowder);
+        } else if (res == "橄榄油") {
+            emit classificationForResult(RESULT::OliveOil);
+        } else if (res == "水") {
+            emit classificationForResult(RESULT::Water);
+        } else if (res == "糖水") {
             emit classificationForResult(RESULT::TongSui);
-        else if (res == "芝麻油")
+        } else if (res == "芝麻油") {
             emit classificationForResult(RESULT::SesameOil);
-        else if (res == "葵花籽油")
+        } else if (res == "葵花籽油") {
             emit classificationForResult(RESULT::SunflowerOil);
-        else if (res == "75酒精")
+        } else if (res == "75酒精") {
             emit classificationForResult(RESULT::Alcohol75);
-        else if (res == "C2H4O2")
+        } else if (res == "C2H4O2") {
             emit classificationForResult(RESULT::C2H4O2);
-        else if (res == "C2H6O")
+        } else if (res == "C2H6O") {
             emit classificationForResult(RESULT::C2H6O);
-        else if (res == "玉米油")
+        } else if (res == "玉米油") {
             emit classificationForResult(RESULT::CornOil);
-        else if (res == "空瓶")
+        } else if (res == "空瓶") {
             emit classificationForResult(RESULT::EmptyBottle);
+        }
 
         emit classificationForHistory(obj);
         cleanup();

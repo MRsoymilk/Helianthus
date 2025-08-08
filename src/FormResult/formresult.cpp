@@ -61,7 +61,7 @@ void FormResult::showResult(RESULT result)
     case RESULT::Salt:
         ui->widget->load(QUrl("qrc:/res/page/Salt.html"));
         break;
-    case RESULT::NaHCO3:
+    case RESULT::SodiumBicarbonate:
         ui->widget->load(QUrl("qrc:/res/page/Sodium_bicarbonate.html"));
         break;
     case RESULT::TongSui:
@@ -75,6 +75,9 @@ void FormResult::showResult(RESULT result)
         break;
     case RESULT::SunflowerOil:
         ui->widget->load(QUrl("qrc:/res/page/Sunflower_oil.html"));
+        break;
+    case RESULT::WashingPowder:
+        ui->widget->load(QUrl("qrc:/res/page/Washing_powder.html"));
         break;
     }
 }
