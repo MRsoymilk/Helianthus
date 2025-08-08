@@ -107,8 +107,8 @@ void ThreadWorker::onOtoRequest(bool going, const QString &url)
 
 void ThreadWorker::otoRequest()
 {
-    MyHttp *http = new MyHttp(this);
-    QJsonObject obj = http->get_sync(m_url);
+    MyHttp http;
+    QJsonObject obj = http.get_sync(m_url);
     emit otoRequestRaw(obj);
 
     QJsonArray arr = obj["spectrum"].toArray();
@@ -140,6 +140,7 @@ void ThreadWorker::otoRequest()
 
     emit dataForTableReady(v_voltage24, raw24);
     emit dataForPlotReady(out24, xMin, xMax, yMin, yMax);
+    sendPredictRequest(v_voltage24);
 }
 
 void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
@@ -153,9 +154,10 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
     MyHttp *http = new MyHttp(this);
     QUrl url("http://192.168.123.233:5010/knn_predict");
 
+    auto cleanup = [http]() { http->deleteLater(); };
+
     connect(http, &MyHttp::jsonResponse, this, [=](const QJsonObject &obj) {
         QString res = obj["result"].toString();
-
         if (res == "橄榄油")
             emit classificationForResult(RESULT::OliveOil);
         else if (res == "水")
@@ -180,12 +182,12 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
             emit classificationForResult(RESULT::EmptyBottle);
 
         emit classificationForHistory(obj);
-        http->deleteLater();
+        cleanup();
     });
 
     connect(http, &MyHttp::httpError, this, [=](const QString &err) {
         qWarning() << "HTTP error:" << err;
-        http->deleteLater();
+        cleanup();
     });
 
     http->postJson(url, inputObj);
