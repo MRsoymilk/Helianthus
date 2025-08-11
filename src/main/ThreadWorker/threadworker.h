@@ -14,6 +14,12 @@ public:
 public slots:
     void processData(const QByteArray &data24);
     void onOtoRequest(bool going, const QString &url);
+    void onPlotMethod(int method);
+    void onPlotStartEnd(int start, int end);
+    void onPlotIntegration(int ms);
+    void onPlotSubBaseline(bool isDo);
+    void onPlotClassify(bool isDo);
+
 signals:
     void dataForTableReady(const QVector<double> &v24, const QVector<qint32> &raw24);
     void dataForPlotReady(const QList<QPointF> &v24,
@@ -36,6 +42,13 @@ private:
 
     QTimer *m_timer;
     QString m_url;
+    int m_plot_start, m_plot_end;
+    int m_plot_method;
+    int m_plot_integration;
+    bool m_plot_sub_baseline;
+    QMap<int, double> m_plot_baseline;
+    int m_plot_baseline_count;
+    bool m_plot_classify;
 };
 
 #endif // THREADWORKER_H

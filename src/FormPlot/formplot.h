@@ -14,6 +14,8 @@ class PlotHistory;
 class FormPlot : public QWidget
 {
     Q_OBJECT
+public:
+    enum class METHOD { REFLECTION, TRANSMISSION };
 
 public:
     explicit FormPlot(QWidget *parent = nullptr);
@@ -23,7 +25,11 @@ signals:
     void processSerialData(const QByteArray &data24);
     void send2PlotData(const QVector<double> &v24, const QVector<qint32> &raw24);
     void send2PlotHistory(const QList<QPointF> &v24);
-
+    void sendPlotMethod(int method);
+    void sendPlotStartEnd(int start, int end);
+    void sendPlotIntegration(int ms);
+    void sendPlotBaselineSub(bool isDo);
+    void sendPlotClassify(bool isDo);
 public slots:
     void onSerialDataReceived(const QByteArray &data24);
     void updatePlot(const QList<QPointF> &v24,
@@ -42,6 +48,13 @@ private slots:
     void on_tBtnData_clicked();
     void onPlotHistoryClose();
     void onPlotDataClose();
+    void on_tBtnBaselineSubtraction_clicked();
+    void on_comboBoxMethod_currentTextChanged(const QString &text);
+    void on_spinBoxStart_valueChanged(int val);
+    void on_spinBoxEnd_valueChanged(int val);
+    void on_spinBox_ms_valueChanged(int val);
+    void on_tBtnPicture_clicked();
+    void on_tBtnClassify_clicked();
 
 private:
     void init();
@@ -58,8 +71,11 @@ private:
     bool m_autoZoom;
     bool m_showHistory;
     bool m_showData;
+    bool m_baseline_sub;
+    bool m_classify;
     PlotData *m_plotData;
     PlotHistory *m_plotHistory;
+    METHOD m_method;
 };
 
 #endif // FORMPLOT_H

@@ -11,6 +11,10 @@
 ThreadWorker::ThreadWorker(QObject *parent)
     : QObject(parent)
 {
+    m_plot_classify = false;
+    m_plot_start = m_plot_end = 0;
+    m_plot_integration = 0;
+    m_plot_method = 0;
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &ThreadWorker::otoRequest);
 }
@@ -92,17 +96,53 @@ void ThreadWorker::processData(const QByteArray &data24)
         signalArray.append(val);
     inputObj["signal"] = signalArray;
 
-    sendPredictRequest(v_voltage24);
+    if (m_plot_classify) {
+        sendPredictRequest(v_voltage24);
+    }
 }
 
 void ThreadWorker::onOtoRequest(bool going, const QString &url)
 {
     if (going) {
-        m_url = url;
+        if (m_plot_integration != 0) {
+            m_url = QString("%1?integration_time_us=%2").arg(url).arg(m_plot_integration);
+        } else {
+            m_url = url;
+        }
         m_timer->start(100);
     } else {
         m_timer->stop();
     }
+}
+
+void ThreadWorker::onPlotMethod(int method)
+{
+    m_plot_method = method;
+}
+
+void ThreadWorker::onPlotStartEnd(int start, int end)
+{
+    m_plot_start = start;
+    m_plot_end = end;
+}
+
+void ThreadWorker::onPlotIntegration(int ms)
+{
+    m_plot_integration = ms;
+}
+
+void ThreadWorker::onPlotSubBaseline(bool isDo)
+{
+    m_plot_sub_baseline = isDo;
+    if (isDo) {
+        m_plot_baseline.clear();
+        m_plot_baseline_count = 10;
+    }
+}
+
+void ThreadWorker::onPlotClassify(bool isDo)
+{
+    m_plot_classify = isDo;
 }
 
 void ThreadWorker::otoRequest()
@@ -120,27 +160,61 @@ void ThreadWorker::otoRequest()
     QList<QPointF> out24;
     QVector<double> v_voltage24;
     QVector<qint32> raw24;
-
-    for (const QJsonValue &value : arr) {
-        if (value.isObject()) {
-            QJsonObject item = value.toObject();
-            for (auto it = item.begin(); it != item.end(); ++it) {
-                double wavelength = it.key().toDouble();
-                double intensity = it.value().toDouble();
-                out24.push_back({wavelength, intensity});
-                xMin = std::min(xMin, wavelength);
-                xMax = std::max(xMax, wavelength);
-                yMin = std::min(yMin, intensity);
-                yMax = std::max(yMax, intensity);
-                v_voltage24.push_back(intensity);
-                raw24.push_back(0);
+    for (int i = 0; i < arr.size(); ++i) {
+        QJsonObject item = arr.at(i).toObject();
+        for (auto it = item.begin(); it != item.end(); ++it) {
+            double wavelength = it.key().toDouble();
+            double intensity = it.value().toDouble();
+            out24.push_back({wavelength, intensity});
+            if (m_plot_baseline_count > 0) {
+                m_plot_baseline[i] += intensity;
             }
+            xMin = std::min(xMin, wavelength);
+            xMax = std::max(xMax, wavelength);
+            yMin = std::min(yMin, intensity);
+            yMax = std::max(yMax, intensity);
+            v_voltage24.push_back(intensity);
+            raw24.push_back(0);
+        }
+    }
+
+    if (m_plot_baseline_count > 0) {
+        --m_plot_baseline_count;
+    }
+
+    if (m_plot_start != 0) {
+        xMin = m_plot_start;
+    }
+    if (m_plot_end != 0) {
+        xMax = m_plot_end;
+    }
+    if (m_plot_sub_baseline && m_plot_baseline_count == 0) {
+        for (int i = 0; i < v_voltage24.size(); ++i) {
+            v_voltage24[i] -= m_plot_baseline[i] / 10;
+        }
+        for (int i = 0; i < out24.size(); ++i) {
+            out24[i].setY(out24[i].y() - m_plot_baseline[i] / 10);
+            yMin = std::min(yMin, out24[i].y());
+            yMax = std::max(yMax, out24[i].y());
+        }
+    }
+    // TRANSMISSION
+    if (m_plot_method == 1) {
+        for (int i = 0; i < v_voltage24.size(); ++i) {
+            v_voltage24[i] /= (m_plot_baseline[i] / 10.0);
+        }
+        for (int i = 0; i < out24.size(); ++i) {
+            out24[i].setY(out24[i].y() / (m_plot_baseline[i] / 10.0));
+            yMin = std::min(yMin, out24[i].y());
+            yMax = std::max(yMax, out24[i].y());
         }
     }
 
     emit dataForTableReady(v_voltage24, raw24);
     emit dataForPlotReady(out24, xMin, xMax, yMin, yMax);
-    sendPredictRequest(v_voltage24);
+    if (m_plot_classify) {
+        sendPredictRequest(v_voltage24);
+    }
 }
 
 void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)

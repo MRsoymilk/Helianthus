@@ -48,6 +48,12 @@ const QString CFG_GROUP_OTO = "OTO";
 const QString CFG_OTO_INFO = "info";
 const QString CFG_OTO_SPECTRUM = "spectrum";
 
+const QString CFG_GROUP_REFLECTION = "Reflection";
+const QString CFG_GROUP_TRANSMISSION = "Transmission";
+const QString CFG_INTEGRATION = "integration";
+const QString CFG_START = "start";
+const QString CFG_END = "end";
+
 const QString VAL_ENABLE = "enalbe";
 const QString VAL_DISABLE = "disable";
 

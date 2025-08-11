@@ -63,6 +63,11 @@ void MainWindow::init()
             m_plot,
             &FormPlot::updateTable,
             Qt::QueuedConnection);
+    connect(m_plot, &FormPlot::sendPlotMethod, m_worker, &ThreadWorker::onPlotMethod);
+    connect(m_plot, &FormPlot::sendPlotStartEnd, m_worker, &ThreadWorker::onPlotStartEnd);
+    connect(m_plot, &FormPlot::sendPlotIntegration, m_worker, &ThreadWorker::onPlotIntegration);
+    connect(m_plot, &FormPlot::sendPlotBaselineSub, m_worker, &ThreadWorker::onPlotSubBaseline);
+    connect(m_plot, &FormPlot::sendPlotClassify, m_worker, &ThreadWorker::onPlotClassify);
     connect(m_worker, &ThreadWorker::classificationForResult, m_result, &FormResult::showResult);
     connect(m_worker,
             &ThreadWorker::classificationForHistory,
