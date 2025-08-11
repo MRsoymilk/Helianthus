@@ -42,11 +42,12 @@ private:
 
     QTimer *m_timer;
     QString m_url;
+    QString m_base_url;
     int m_plot_start, m_plot_end;
     int m_plot_method;
     int m_plot_integration;
-    bool m_plot_sub_baseline;
-    QMap<int, double> m_plot_baseline;
+    bool m_b_plot_sub_baseline;
+    QMap<int, double> m_map_plot_baseline;
     int m_plot_baseline_count;
     bool m_plot_classify;
 };

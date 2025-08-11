@@ -49,6 +49,15 @@ void FormPlot::updateTable(const QVector<double> &v24, const QVector<qint32> &ra
     emit send2PlotData(v24, raw24);
 }
 
+void FormPlot::onSendParams()
+{
+    emit sendPlotMethod(ui->comboBoxMethod->currentIndex());
+    emit sendPlotStartEnd(ui->spinBoxStart->value(), ui->spinBoxEnd->value());
+    emit sendPlotIntegration(ui->spinBox_ms->value());
+    emit sendPlotBaselineSub(ui->tBtnBaselineSubtraction->isChecked());
+    emit sendPlotClassify(ui->tBtnClassify->isChecked());
+}
+
 void FormPlot::init()
 {
     m_series24 = new QLineSeries();
@@ -201,7 +210,7 @@ void FormPlot::on_comboBoxMethod_currentTextChanged(const QString &text)
         ui->spinBox_ms->setValue(
             SETTING_CONFIG_GET(CFG_GROUP_TRANSMISSION, CFG_INTEGRATION).toInt());
     }
-    emit sendPlotMethod(static_cast<int>(m_method));
+    emit onSendParams();
 }
 
 void FormPlot::on_spinBoxStart_valueChanged(int val)

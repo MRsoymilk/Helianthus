@@ -17,6 +17,7 @@ public:
 
 signals:
     void otoRequest(bool going, const QString &url);
+    void otoCallParams();
 
 public slots:
     void onOtoRequestRaw(const QJsonObject &obj);

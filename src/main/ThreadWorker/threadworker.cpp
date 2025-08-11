@@ -15,6 +15,9 @@ ThreadWorker::ThreadWorker(QObject *parent)
     m_plot_start = m_plot_end = 0;
     m_plot_integration = 0;
     m_plot_method = 0;
+    m_map_plot_baseline.clear();
+    m_plot_baseline_count = 0;
+    m_b_plot_sub_baseline = false;
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &ThreadWorker::otoRequest);
 }
@@ -104,11 +107,7 @@ void ThreadWorker::processData(const QByteArray &data24)
 void ThreadWorker::onOtoRequest(bool going, const QString &url)
 {
     if (going) {
-        if (m_plot_integration != 0) {
-            m_url = QString("%1?integration_time_us=%2").arg(url).arg(m_plot_integration);
-        } else {
-            m_url = url;
-        }
+        m_base_url = url;
         m_timer->start(100);
     } else {
         m_timer->stop();
@@ -128,14 +127,14 @@ void ThreadWorker::onPlotStartEnd(int start, int end)
 
 void ThreadWorker::onPlotIntegration(int ms)
 {
-    m_plot_integration = ms;
+    m_plot_integration = ms * 1000;
 }
 
 void ThreadWorker::onPlotSubBaseline(bool isDo)
 {
-    m_plot_sub_baseline = isDo;
+    m_b_plot_sub_baseline = isDo;
     if (isDo) {
-        m_plot_baseline.clear();
+        m_map_plot_baseline.clear();
         m_plot_baseline_count = 10;
     }
 }
@@ -148,6 +147,11 @@ void ThreadWorker::onPlotClassify(bool isDo)
 void ThreadWorker::otoRequest()
 {
     MyHttp http;
+    if (m_plot_integration != 0) {
+        m_url = QString("%1?integration_time_us=%2").arg(m_base_url).arg(m_plot_integration);
+    } else {
+        m_url = m_base_url;
+    }
     QJsonObject obj = http.get_sync(m_url);
     emit otoRequestRaw(obj);
 
@@ -167,7 +171,7 @@ void ThreadWorker::otoRequest()
             double intensity = it.value().toDouble();
             out24.push_back({wavelength, intensity});
             if (m_plot_baseline_count > 0) {
-                m_plot_baseline[i] += intensity;
+                m_map_plot_baseline[i] += intensity;
             }
             xMin = std::min(xMin, wavelength);
             xMax = std::max(xMax, wavelength);
@@ -188,25 +192,30 @@ void ThreadWorker::otoRequest()
     if (m_plot_end != 0) {
         xMax = m_plot_end;
     }
-    if (m_plot_sub_baseline && m_plot_baseline_count == 0) {
-        for (int i = 0; i < v_voltage24.size(); ++i) {
-            v_voltage24[i] -= m_plot_baseline[i] / 10;
+    if (m_b_plot_sub_baseline && m_plot_baseline_count == 0) {
+        yMin = std::numeric_limits<double>::max();
+        yMax = std::numeric_limits<double>::lowest();
+        // REFLECTION
+        if (m_plot_method == 0) {
+            for (int i = 0; i < v_voltage24.size(); ++i) {
+                v_voltage24[i] -= m_map_plot_baseline[i] / 10;
+            }
+            for (int i = 0; i < out24.size(); ++i) {
+                out24[i].setY(out24[i].y() - m_map_plot_baseline[i] / 10);
+                yMin = std::min(yMin, out24[i].y());
+                yMax = std::max(yMax, out24[i].y());
+            }
         }
-        for (int i = 0; i < out24.size(); ++i) {
-            out24[i].setY(out24[i].y() - m_plot_baseline[i] / 10);
-            yMin = std::min(yMin, out24[i].y());
-            yMax = std::max(yMax, out24[i].y());
-        }
-    }
-    // TRANSMISSION
-    if (m_plot_method == 1) {
-        for (int i = 0; i < v_voltage24.size(); ++i) {
-            v_voltage24[i] /= (m_plot_baseline[i] / 10.0);
-        }
-        for (int i = 0; i < out24.size(); ++i) {
-            out24[i].setY(out24[i].y() / (m_plot_baseline[i] / 10.0));
-            yMin = std::min(yMin, out24[i].y());
-            yMax = std::max(yMax, out24[i].y());
+        // TRANSMISSION
+        else if (m_plot_method == 1) {
+            for (int i = 0; i < v_voltage24.size(); ++i) {
+                v_voltage24[i] = v_voltage24[i] / (m_map_plot_baseline[i] / 10.0) * 100;
+            }
+            for (int i = 0; i < out24.size(); ++i) {
+                out24[i].setY(out24[i].y() / (m_map_plot_baseline[i] / 10.0) * 100);
+                yMax = std::max(yMax, out24[i].y());
+            }
+            yMin = 0;
         }
     }
 
@@ -224,6 +233,7 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
     for (double val : v_voltage24)
         signalArray.append(val);
     inputObj["signal"] = signalArray;
+    inputObj["method"] = m_plot_method == 0 ? "reflection" : "transmission";
 
     MyHttp *http = new MyHttp(this);
     QUrl url("http://192.168.123.233:5010/knn_predict");

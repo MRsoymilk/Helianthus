@@ -38,6 +38,7 @@ public slots:
                     const double &yMin,
                     const double &yMax);
     void updateTable(const QVector<double> &v24, const QVector<qint32> &raw24);
+    void onSendParams();
 
 protected:
     void wheelEvent(QWheelEvent *event) override;

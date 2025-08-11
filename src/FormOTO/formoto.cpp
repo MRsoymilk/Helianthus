@@ -50,6 +50,7 @@ void FormOTO::on_btnSendSpectrum_clicked()
         SETTING_CONFIG_SET(CFG_GROUP_OTO, CFG_OTO_SPECTRUM, ui->lineEditURLSpectrum->text());
         ui->btnSendSpectrum->setText(tr("To Close"));
         emit otoRequest(true, ui->lineEditURLSpectrum->text());
+        emit otoCallParams();
     } else {
         ui->btnSendSpectrum->setText(tr("To Open"));
         emit otoRequest(false, "");

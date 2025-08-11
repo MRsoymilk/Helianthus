@@ -75,6 +75,7 @@ void MainWindow::init()
             &FormHistory::recordHistory,
             Qt::QueuedConnection);
     connect(m_oto, &FormOTO::otoRequest, m_worker, &ThreadWorker::onOtoRequest);
+    connect(m_oto, &FormOTO::otoCallParams, m_plot, &FormPlot::onSendParams);
     connect(m_worker, &ThreadWorker::otoRequestRaw, m_oto, &FormOTO::onOtoRequestRaw);
 
     m_workerThread->start();
