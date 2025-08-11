@@ -26,7 +26,7 @@ FormHistory::~FormHistory()
 
 void FormHistory::initModel()
 {
-    m_model->setHorizontalHeaderLabels({"timestamp", "result", "elapsed(ms)"});
+    m_model->setHorizontalHeaderLabels({"timestamp", "method", "result", "elapsed(ms)"});
     ui->tableView->setModel(m_model);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
@@ -53,24 +53,26 @@ void FormHistory::recordHistory(const QJsonObject &obj)
 {
     QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
     QString result = obj.value("result").toString();
+    QString method = obj.value("method").toString();
     double elapsed = obj.value("elapsed").toDouble();
 
     // 显示在表格中
     QList<QStandardItem *> rowItems;
-    rowItems << new QStandardItem(timestamp) << new QStandardItem(result)
-             << new QStandardItem(QString::number(elapsed, 'f', 3));
+    rowItems << new QStandardItem(timestamp) << new QStandardItem(method)
+             << new QStandardItem(result) << new QStandardItem(QString::number(elapsed, 'f', 3));
     m_model->appendRow(rowItems);
 
     if (m_file.isOpen()) {
         // 写 header（仅第一次写）
         if (!m_headerWritten) {
-            m_stream << "timestamp,result,elapsed(ms)\n";
+            m_stream << "timestamp,type,result,elapsed(ms)\n";
             m_stream.flush();
             m_headerWritten = true;
         }
 
         // 写数据行
-        m_stream << timestamp << "," << result << "," << QString::number(elapsed, 'f', 6) << "\n";
+        m_stream << timestamp << "," << method << "," << result << ","
+                 << QString::number(elapsed, 'f', 6) << "\n";
         m_stream.flush();
     }
 }

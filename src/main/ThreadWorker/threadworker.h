@@ -30,6 +30,7 @@ signals:
     void classificationForResult(RESULT result);
     void classificationForHistory(const QJsonObject &obj);
     void otoRequestRaw(const QJsonObject &obj);
+    void otoBaselineProgress(const QString &progress);
 
 private:
     void processCurve24(const QByteArray &data24,

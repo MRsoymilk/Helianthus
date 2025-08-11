@@ -65,30 +65,39 @@ void AutoUpdate::on_btnUpdate_clicked()
 {
     ui->progressBar->setVisible(true);
     QString to_downloaded = m_objUpdate["file"].toString();
+    QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    QString fullPath = QDir(tempDir).filePath(to_downloaded);
+
+    QFile *file = new QFile(fullPath);
+    if (!file->open(QIODevice::WriteOnly)) {
+        ui->textBrowser->append("❌ 无法创建文件：" + fullPath);
+        delete file;
+        return;
+    }
+
     m_http->downloadBinary(
         ui->lineEditURL->text(),
-        [=](QByteArray data) {
-            QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-            QString fullPath = QDir(tempDir).filePath(to_downloaded);
+        // 分块回调
+        [=](const QByteArray &chunk, bool finished) mutable {
+            if (!chunk.isEmpty())
+                file->write(chunk);
 
-            QFile file(fullPath);
-            if (file.open(QIODevice::WriteOnly)) {
-                file.write(data);
-                file.close();
+            if (finished) {
+                file->close();
                 ui->textBrowser->append("✅ 下载完成并保存成功：" + fullPath);
-
                 QProcess::startDetached(fullPath);
-
-            } else {
-                ui->textBrowser->append("❌ 无法保存文件：" + fullPath);
+                file->deleteLater();
             }
         },
-        [=](QString err) { ui->textBrowser->append("❌ 下载失败: " + err); },
+        // 错误
+        [=](QString err) {
+            ui->textBrowser->append("❌ 下载失败: " + err);
+            file->deleteLater();
+        },
+        // 进度
         [=](qint64 received, qint64 total) {
-            if (total > 0) {
-                int percent = static_cast<int>((double(received) / total) * 100);
-                ui->progressBar->setValue(percent);
-            }
+            if (total > 0)
+                ui->progressBar->setValue((received * 100) / total);
         });
 }
 
