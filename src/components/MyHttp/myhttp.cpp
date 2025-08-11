@@ -39,7 +39,7 @@ void MyHttp::postJson(const QUrl &url, const QJsonObject &json)
 }
 
 void MyHttp::downloadBinary(const QString &url,
-                            std::function<void(QByteArray)> onSuccess,
+                            std::function<void(const QByteArray &chunk, bool finished)> onData,
                             std::function<void(QString)> onError,
                             std::function<void(qint64, qint64)> onProgress)
 {
@@ -47,27 +47,41 @@ void MyHttp::downloadBinary(const QString &url,
     QNetworkRequest request(qurl);
     QNetworkReply *reply = m_manager->get(request);
 
+    // 下载进度
     if (onProgress) {
         connect(reply,
                 &QNetworkReply::downloadProgress,
                 reply,
-                [reply, onProgress](qint64 received, qint64 total) { onProgress(received, total); });
+                [onProgress](qint64 received, qint64 total) { onProgress(received, total); });
     }
 
-    connect(reply, &QNetworkReply::finished, reply, [reply, onSuccess, onError]() {
+    // 分块读取
+    connect(reply, &QIODevice::readyRead, reply, [reply, onData]() {
+        QByteArray chunk = reply->readAll(); // 读到当前已到达的所有数据
+        if (!chunk.isEmpty()) {
+            onData(chunk, false); // false = 还没完成
+        }
+    });
+
+    // 下载完成
+    connect(reply, &QNetworkReply::finished, reply, [reply, onData, onError]() {
         if (reply->error() != QNetworkReply::NoError) {
             onError(reply->errorString());
         } else {
-            QByteArray data = reply->readAll();
-            onSuccess(data);
+            QByteArray lastChunk = reply->readAll(); // 可能还有没读的
+            if (!lastChunk.isEmpty()) {
+                onData(lastChunk, false);
+            }
+            onData(QByteArray(), true); // true = 已完成
         }
         reply->deleteLater();
     });
 
+    // 错误
     connect(reply,
             QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::errorOccurred),
             reply,
-            [reply, onError](QNetworkReply::NetworkError) { onError(reply->errorString()); });
+            [onError](QNetworkReply::NetworkError) { onError("网络错误"); });
 }
 
 QJsonObject MyHttp::get_sync(const QString &url)
