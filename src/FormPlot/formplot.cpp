@@ -39,7 +39,11 @@ void FormPlot::updatePlot(const QList<QPointF> &v24,
         }
         m_axisY->setRange(yMin - padding, yMax + padding);
     } else {
-        m_axisY->setRange(m_fixedYMin, m_fixedYMax);
+        if (ui->spinBoxStartY->value() < ui->spinBoxEndY->value()) {
+            m_axisY->setRange(ui->spinBoxStartY->value(), ui->spinBoxEndY->value());
+        } else {
+            m_axisY->setRange(m_fixedYMin, m_fixedYMax);
+        }
     }
     emit send2PlotHistory(v24);
 }
@@ -96,13 +100,13 @@ void FormPlot::init()
     ui->stackedWidget->addWidget(m_view);
     ui->stackedWidget->setCurrentWidget(m_view);
 
+    m_autoZoom = true;
     m_showData = false;
     m_showHistory = false;
     m_baseline_sub = false;
     m_classify = false;
-    ui->tBtnData->setChecked(m_showData);
-    ui->tBtnHistory->setChecked(m_showHistory);
     ui->tBtnZoom->setCheckable(true);
+    ui->tBtnZoom->setChecked(m_autoZoom);
     ui->tBtnHistory->setCheckable(true);
     ui->tBtnData->setCheckable(true);
     ui->tBtnBaselineSubtraction->setCheckable(true);
@@ -134,6 +138,11 @@ void FormPlot::on_tBtnZoom_clicked()
 {
     m_autoZoom = !m_autoZoom;
     ui->tBtnZoom->setChecked(m_autoZoom);
+    if (!m_autoZoom) {
+        int start = ui->spinBoxStartY->value();
+        int end = ui->spinBoxEndY->value();
+        m_axisY->setRange(start, end);
+    }
 }
 
 void FormPlot::wheelEvent(QWheelEvent *event)
