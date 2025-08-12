@@ -10,6 +10,7 @@ class FormPlot;
 
 class PlotData;
 class PlotHistory;
+class PlotFilter;
 
 class FormPlot : public QWidget
 {
@@ -30,6 +31,8 @@ signals:
     void sendPlotIntegration(int ms);
     void sendPlotBaselineSub(bool isDo);
     void sendPlotClassify(bool isDo);
+    void sendFilter(const double &average, const double &distance);
+
 public slots:
     void onSerialDataReceived(const QByteArray &data24);
     void updatePlot(const QList<QPointF> &v24,
@@ -39,6 +42,7 @@ public slots:
                     const double &yMax);
     void updateTable(const QVector<double> &v24, const QVector<qint32> &raw24);
     void onSendParams();
+    void onSendLineInfo(const double &val_average, const double &val_distance);
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
@@ -56,6 +60,7 @@ private slots:
     void on_spinBox_ms_valueChanged(int val);
     void on_tBtnPicture_clicked();
     void on_tBtnClassify_clicked();
+    void on_tBtnFilter_clicked();
 
 private:
     void init();
@@ -74,8 +79,10 @@ private:
     bool m_showData;
     bool m_baseline_sub;
     bool m_classify;
+    bool m_showFilter;
     PlotData *m_plotData;
     PlotHistory *m_plotHistory;
+    PlotFilter *m_plotFilter;
     METHOD m_method;
 };
 

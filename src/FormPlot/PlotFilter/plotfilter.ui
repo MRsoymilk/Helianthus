@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PlotFilter</class>
+ <widget class="QWidget" name="PlotFilter">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>460</width>
+    <height>340</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="8" column="0">
+    <widget class="QLabel" name="labelFilterDistance">
+     <property name="text">
+      <string>distance</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0" colspan="2">
+    <widget class="QPushButton" name="btnFilter">
+     <property name="text">
+      <string>filter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <layout class="QFormLayout" name="formLayoutAvg">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelAvgMin">
+       <property name="text">
+        <string>Min</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelAvgMax">
+       <property name="text">
+        <string>Max</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="labelValAvgMin">
+       <property name="text">
+        <string>val min</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="labelValAvgMax">
+       <property name="text">
+        <string>val max</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLineEdit" name="lineEditValAverage"/>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="labelValAverage">
+     <property name="text">
+      <string>average of current line</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QLineEdit" name="lineEditFilterDistance"/>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="labelFilterAverage">
+     <property name="text">
+      <string>average</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="lineEditFilterAverage"/>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QLabel" name="labelValDistance">
+     <property name="text">
+      <string>distance with baseline</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QLineEdit" name="lineEditValDistance"/>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <widget class="QLabel" name="labelFilter">
+     <property name="text">
+      <string>Filter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <layout class="QFormLayout" name="formLayoutDist">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelDistMin">
+       <property name="text">
+        <string>Min</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelDistMax">
+       <property name="text">
+        <string>Max</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="labelValDistMin">
+       <property name="text">
+        <string>val min</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="labelValDistMax">
+       <property name="text">
+        <string>val max</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

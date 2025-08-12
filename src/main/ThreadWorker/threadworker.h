@@ -19,6 +19,7 @@ public slots:
     void onPlotIntegration(int ms);
     void onPlotSubBaseline(bool isDo);
     void onPlotClassify(bool isDo);
+    void onSendFilter(const double &average, const double &distance);
 
 signals:
     void dataForTableReady(const QVector<double> &v24, const QVector<qint32> &raw24);
@@ -31,6 +32,7 @@ signals:
     void classificationForHistory(const QJsonObject &obj);
     void otoRequestRaw(const QJsonObject &obj);
     void otoBaselineProgress(const QString &progress);
+    void sendLineInfo(const double &val_average, const double &val_distance);
 
 private:
     void processCurve24(const QByteArray &data24,
@@ -51,6 +53,8 @@ private:
     QMap<int, double> m_map_plot_baseline;
     int m_plot_baseline_count;
     bool m_plot_classify;
+    double m_filter_average;
+    double m_filter_distance;
 };
 
 #endif // THREADWORKER_H

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
+    <width>875</width>
     <height>447</height>
    </rect>
   </property>
@@ -92,6 +92,13 @@
       <widget class="QToolButton" name="tBtnPicture">
        <property name="text">
         <string>Picture</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tBtnFilter">
+       <property name="text">
+        <string>filter</string>
        </property>
       </widget>
      </item>

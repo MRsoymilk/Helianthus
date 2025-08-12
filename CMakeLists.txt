@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Helianthus VERSION 0.0.11 LANGUAGES CXX)
+project(Helianthus VERSION 0.0.12 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -54,6 +54,9 @@ set(PROJECT_SOURCES
         src/FormSetting/SerialFrame/serialframe.ui
         src/FormPlot/PlotData/plotdata.h
         src/FormPlot/PlotData/plotdata.cpp
+        src/FormPlot/PlotFilter/plotfilter.h
+        src/FormPlot/PlotFilter/plotfilter.cpp
+        src/FormPlot/PlotFilter/plotfilter.ui
         src/main/ThreadWorker/threadworker.h
         src/main/ThreadWorker/threadworker.cpp
         src/FormPlot/PlotData/plotdata.h

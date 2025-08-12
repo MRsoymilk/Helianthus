@@ -144,6 +144,12 @@ void ThreadWorker::onPlotClassify(bool isDo)
     m_plot_classify = isDo;
 }
 
+void ThreadWorker::onSendFilter(const double &average, const double &distance)
+{
+    m_filter_average = average;
+    m_filter_distance = distance;
+}
+
 void ThreadWorker::otoRequest()
 {
     MyHttp http;
@@ -192,6 +198,10 @@ void ThreadWorker::otoRequest()
     if (m_plot_end != 0) {
         xMax = m_plot_end;
     }
+
+    double val_average = 0;
+    double val_distance = 0;
+
     if (m_b_plot_sub_baseline && m_plot_baseline_count == 0) {
         yMin = std::numeric_limits<double>::max();
         yMax = std::numeric_limits<double>::lowest();
@@ -217,12 +227,25 @@ void ThreadWorker::otoRequest()
             }
             yMin = 0;
         }
+
+        for (int i = 0; i < v_voltage24.size(); ++i) {
+            // average
+            val_average += v_voltage24[i];
+            // distance
+            val_distance = std::abs(v_voltage24[i] - m_map_plot_baseline[i] / 10.0);
+        }
+        val_average /= v_voltage24.size();
+        emit sendLineInfo(val_average, val_distance);
     }
 
     emit dataForTableReady(v_voltage24, raw24);
     emit dataForPlotReady(out24, xMin, xMax, yMin, yMax);
     if (m_plot_classify) {
-        sendPredictRequest(v_voltage24);
+        if (val_average > m_filter_average && val_distance > m_filter_distance) {
+            sendPredictRequest(v_voltage24);
+        } else {
+            emit classificationForResult(RESULT::Empty);
+        }
     }
 }
 

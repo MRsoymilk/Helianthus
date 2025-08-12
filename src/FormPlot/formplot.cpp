@@ -1,5 +1,6 @@
 #include "formplot.h"
 #include "PlotData/plotdata.h"
+#include "PlotFilter/plotfilter.h"
 #include "PlotHistory/plothistory.h"
 #include "g_define.h"
 #include "ui_formplot.h"
@@ -62,6 +63,14 @@ void FormPlot::onSendParams()
     emit sendPlotClassify(ui->tBtnClassify->isChecked());
 }
 
+void FormPlot::onSendLineInfo(const double &val_average, const double &val_distance)
+{
+    if (m_plotFilter->isVisible()) {
+        m_plotFilter->setAverage(val_average);
+        m_plotFilter->setDistance(val_distance);
+    }
+}
+
 void FormPlot::init()
 {
     m_series24 = new QLineSeries();
@@ -105,12 +114,14 @@ void FormPlot::init()
     m_showHistory = false;
     m_baseline_sub = false;
     m_classify = false;
+    m_classify = false;
     ui->tBtnZoom->setCheckable(true);
     ui->tBtnZoom->setChecked(m_autoZoom);
     ui->tBtnHistory->setCheckable(true);
     ui->tBtnData->setCheckable(true);
     ui->tBtnBaselineSubtraction->setCheckable(true);
     ui->tBtnClassify->setCheckable(true);
+    ui->tBtnFilter->setCheckable(true);
 
     m_plotData = new PlotData;
     connect(this, &FormPlot::send2PlotData, m_plotData, &PlotData::updateTable);
@@ -119,6 +130,13 @@ void FormPlot::init()
     m_plotHistory = new PlotHistory;
     connect(this, &FormPlot::send2PlotHistory, m_plotHistory, &PlotHistory::updateChart);
     connect(m_plotHistory, &PlotHistory::plotHistoryClose, this, &FormPlot::onPlotHistoryClose);
+
+    m_plotFilter = new PlotFilter;
+    connect(m_plotFilter, &PlotFilter::sendFilter, this, &FormPlot::sendFilter);
+    connect(m_plotFilter, &PlotFilter::windowClose, this, [&]() {
+        m_showFilter = false;
+        ui->tBtnFilter->setChecked(m_showFilter);
+    });
 
     ui->comboBoxMethod->addItems({tr("Reflection"), tr("Transmission")});
 
@@ -298,4 +316,16 @@ void FormPlot::on_tBtnClassify_clicked()
     m_classify = !m_classify;
     ui->tBtnClassify->setChecked(m_classify);
     emit sendPlotClassify(m_classify);
+}
+
+void FormPlot::on_tBtnFilter_clicked()
+{
+    m_showFilter = !m_showFilter;
+    ui->tBtnClassify->setChecked(m_showFilter);
+    if (m_showFilter) {
+        m_plotFilter->resetMinMax();
+        m_plotFilter->show();
+    } else {
+        m_plotFilter->hide();
+    }
 }
