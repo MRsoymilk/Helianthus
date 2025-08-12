@@ -228,11 +228,10 @@ void ThreadWorker::otoRequest()
             yMin = 0;
         }
 
-        for (int i = 0; i < v_voltage24.size(); ++i) {
+        for (int i = 0; i < out24.size(); ++i) {
             // average
-            val_average += v_voltage24[i];
-            // distance
-            val_distance += std::abs(v_voltage24[i] - m_map_plot_baseline[i] / 10.0);
+            val_average += out24[i].y();
+            val_distance += std::abs(out24[i].y());
         }
         val_average /= v_voltage24.size();
         emit sendLineInfo(val_average, val_distance);

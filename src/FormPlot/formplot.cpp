@@ -114,7 +114,7 @@ void FormPlot::init()
     m_showHistory = false;
     m_baseline_sub = false;
     m_classify = false;
-    m_classify = false;
+    m_showFilter = false;
     ui->tBtnZoom->setCheckable(true);
     ui->tBtnZoom->setChecked(m_autoZoom);
     ui->tBtnHistory->setCheckable(true);
@@ -321,7 +321,7 @@ void FormPlot::on_tBtnClassify_clicked()
 void FormPlot::on_tBtnFilter_clicked()
 {
     m_showFilter = !m_showFilter;
-    ui->tBtnClassify->setChecked(m_showFilter);
+    ui->tBtnFilter->setChecked(m_showFilter);
     if (m_showFilter) {
         m_plotFilter->resetMinMax();
         m_plotFilter->show();
