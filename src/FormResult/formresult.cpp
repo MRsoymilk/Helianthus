@@ -1,6 +1,8 @@
 #include "formresult.h"
 #include "ui_formresult.h"
 
+#include <QDir>
+
 FormResult::FormResult(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::FormResult)
@@ -14,6 +16,48 @@ FormResult::~FormResult()
     delete ui;
 }
 
+static QString resultToLocalFileUrl(RESULT result)
+{
+    static const QMap<RESULT, QString> resultMap = {
+        {RESULT::Water, "Water.html"},
+        {RESULT::Alcohol75, "Alcoholic_beverage.html"},
+        {RESULT::C2H4O2, "C2H4O2.html"},
+        {RESULT::C2H6O, "C2H6O.html"},
+        {RESULT::CornOil, "Corn_oil.html"},
+        {RESULT::EmptyBottle, "Bottle.html"},
+        {RESULT::Empty, "Empty.html"},
+        {RESULT::Starch, "Starch.html"},
+        {RESULT::Sugar, "Sugar.html"},
+        {RESULT::Salt, "Salt.html"},
+        {RESULT::SodiumBicarbonate, "Sodium_bicarbonate.html"},
+        {RESULT::TongSui, "Tong_sui.html"},
+        {RESULT::OliveOil, "Olive_oil.html"},
+        {RESULT::SesameOil, "Sesame_oil.html"},
+        {RESULT::SunflowerOil, "Sunflower_oil.html"},
+        {RESULT::WashingPowder, "Washing_powder.html"},
+    };
+
+    QString fileName = resultMap.value(result);
+    if (fileName.isEmpty())
+        return {};
+
+    QString filePath = QDir(QCoreApplication::applicationDirPath()).filePath("page/" + fileName);
+
+    return QUrl::fromLocalFile(filePath).toString();
+}
+
+void FormResult::showResult(RESULT result)
+{
+    if (result == lastResult)
+        return;
+    lastResult = result;
+
+    QString url = resultToLocalFileUrl(result);
+    if (!url.isEmpty()) {
+        ui->widget->load(QUrl(url));
+    }
+}
+
 void FormResult::init()
 {
     ui->widget->page()->runJavaScript(R"(
@@ -21,63 +65,5 @@ void FormResult::init()
         el.addEventListener('click', e => e.preventDefault());
     });
 )");
-    ui->widget->load(QUrl("qrc:/res/page/Empty.html"));
-}
-
-void FormResult::showResult(RESULT result)
-{
-    if (result == lastResult) {
-        return;
-    }
-    lastResult = result;
-    switch (result) {
-    case RESULT::Water:
-        ui->widget->load(QUrl("qrc:/res/page/Water.html"));
-        break;
-    case RESULT::Alcohol75:
-        ui->widget->load(QUrl("qrc:/res/page/Alcoholic_beverage.html"));
-        break;
-    case RESULT::C2H4O2:
-        ui->widget->load(QUrl("qrc:/res/page/C2H4O2.html"));
-        break;
-    case RESULT::C2H6O:
-        ui->widget->load(QUrl("qrc:/res/page/C2H6O.html"));
-        break;
-    case RESULT::CornOil:
-        ui->widget->load(QUrl("qrc:/res/page/Corn_oil.html"));
-        break;
-    case RESULT::EmptyBottle:
-        ui->widget->load(QUrl("qrc:/res/page/Bottle.html"));
-        break;
-    case RESULT::Empty:
-        ui->widget->load(QUrl("qrc:/res/page/Empty.html"));
-        break;
-    case RESULT::Starch:
-        ui->widget->load(QUrl("qrc:/res/page/Starch.html"));
-        break;
-    case RESULT::Sugar:
-        ui->widget->load(QUrl("qrc:/res/page/Sugar.html"));
-        break;
-    case RESULT::Salt:
-        ui->widget->load(QUrl("qrc:/res/page/Salt.html"));
-        break;
-    case RESULT::SodiumBicarbonate:
-        ui->widget->load(QUrl("qrc:/res/page/Sodium_bicarbonate.html"));
-        break;
-    case RESULT::TongSui:
-        ui->widget->load(QUrl("qrc:/res/page/Tong_sui.html"));
-        break;
-    case RESULT::OliveOil:
-        ui->widget->load(QUrl("qrc:/res/page/Olive_oil.html"));
-        break;
-    case RESULT::SesameOil:
-        ui->widget->load(QUrl("qrc:/res/page/Sesame_oil.html"));
-        break;
-    case RESULT::SunflowerOil:
-        ui->widget->load(QUrl("qrc:/res/page/Sunflower_oil.html"));
-        break;
-    case RESULT::WashingPowder:
-        ui->widget->load(QUrl("qrc:/res/page/Washing_powder.html"));
-        break;
-    }
+    ui->widget->load(QUrl(resultToLocalFileUrl(RESULT::Empty)));
 }
