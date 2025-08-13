@@ -19,6 +19,9 @@ public:
 public slots:
     void showResult(RESULT result, const QString &name);
 
+private slots:
+    void on_tBtnClasses_clicked();
+
 private:
     void init();
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Helianthus VERSION 0.0.13 LANGUAGES CXX)
+project(Helianthus VERSION 0.0.14 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -37,6 +37,9 @@ set(PROJECT_SOURCES
         src/FormResult/formresult.h
         src/FormResult/formresult.cpp
         src/FormResult/formresult.ui
+        src/FormResult/ShowClass/showclass.h
+        src/FormResult/ShowClass/showclass.cpp
+        src/FormResult/ShowClass/showclass.ui
         src/FormPlot/formplot.h
         src/FormPlot/formplot.cpp
         src/FormPlot/formplot.ui

@@ -130,6 +130,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>textBrowserData</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>lineEditURLSpectrum</tabstop>
+  <tabstop>btnSendSpectrum</tabstop>
+  <tabstop>lineEditURLInfo</tabstop>
+  <tabstop>btnSendInfo</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

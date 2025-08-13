@@ -1,7 +1,7 @@
 #include "formresult.h"
-#include "ui_formresult.h"
-
 #include <QDir>
+#include "ShowClass/showclass.h"
+#include "ui_formresult.h"
 
 FormResult::FormResult(QWidget *parent)
     : QWidget(parent)
@@ -67,4 +67,10 @@ void FormResult::init()
     });
 )");
     ui->widget->load(QUrl(resultToLocalFileUrl(RESULT::Empty)));
+}
+
+void FormResult::on_tBtnClasses_clicked()
+{
+    ShowClass *show = new ShowClass;
+    show->show();
 }

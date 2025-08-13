@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Filter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="8" column="0">
@@ -134,6 +134,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineEditValAverage</tabstop>
+  <tabstop>lineEditValDistance</tabstop>
+  <tabstop>lineEditFilterAverage</tabstop>
+  <tabstop>lineEditFilterDistance</tabstop>
+  <tabstop>btnFilter</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
