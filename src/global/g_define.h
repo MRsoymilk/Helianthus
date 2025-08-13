@@ -21,6 +21,14 @@ enum class RESULT {
     C2H6O,
     CornOil,
     EmptyBottle,
+    LinenCotton,         // 亚麻棉
+    CottonJersey,        // 全棉汗布
+    DoublefacedCashmere, // 双面羊绒
+    ChevronstyleTweed,   // 小香风粗花呢
+    SilkCotton,          // 真丝棉
+    TartanWool,          // 苏格兰格纹毛呢
+    OpenworkRamie,       // 镂空苎麻
+    Mohair               // 马海毛呢料
 };
 
 const QString CFG_GROUP_SERIAL = "Serial";

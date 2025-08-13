@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Result</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout" rowstretch="0,1,0">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="sizePolicy">
@@ -29,6 +29,13 @@
    </item>
    <item row="1" column="0">
     <widget class="QWebEngineView" name="widget" native="true"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelResult">
+     <property name="text">
+      <string>result</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

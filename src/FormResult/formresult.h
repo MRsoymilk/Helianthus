@@ -17,7 +17,7 @@ public:
     ~FormResult();
 
 public slots:
-    void showResult(RESULT result);
+    void showResult(RESULT result, const QString &name);
 
 private:
     void init();

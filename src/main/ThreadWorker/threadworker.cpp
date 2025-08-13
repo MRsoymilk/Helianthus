@@ -243,7 +243,7 @@ void ThreadWorker::otoRequest()
         if (val_average > m_filter_average && val_distance > m_filter_distance) {
             sendPredictRequest(v_voltage24);
         } else {
-            emit classificationForResult(RESULT::Empty);
+            emit classificationForResult(RESULT::Empty, "Filtered");
         }
     }
 }
@@ -265,37 +265,39 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
     connect(http, &MyHttp::jsonResponse, this, [=](const QJsonObject &obj) {
         QString res = obj["result"].toString();
         if (res == "空") {
-            emit classificationForResult(RESULT::Empty);
+            emit classificationForResult(RESULT::Empty, res);
         } else if (res == "淀粉") {
-            emit classificationForResult(RESULT::Starch);
+            emit classificationForResult(RESULT::Starch, res);
         } else if (res == "糖") {
-            emit classificationForResult(RESULT::Sugar);
+            emit classificationForResult(RESULT::Sugar, res);
         } else if (res == "盐") {
-            emit classificationForResult(RESULT::Salt);
+            emit classificationForResult(RESULT::Salt, res);
         } else if (res == "小苏打") {
-            emit classificationForResult(RESULT::SodiumBicarbonate);
+            emit classificationForResult(RESULT::SodiumBicarbonate, res);
         } else if (res == "洗衣粉") {
-            emit classificationForResult(RESULT::WashingPowder);
+            emit classificationForResult(RESULT::WashingPowder, res);
         } else if (res == "橄榄油") {
-            emit classificationForResult(RESULT::OliveOil);
+            emit classificationForResult(RESULT::OliveOil, res);
         } else if (res == "水") {
-            emit classificationForResult(RESULT::Water);
+            emit classificationForResult(RESULT::Water, res);
         } else if (res == "糖水") {
-            emit classificationForResult(RESULT::TongSui);
+            emit classificationForResult(RESULT::TongSui, res);
         } else if (res == "芝麻油") {
-            emit classificationForResult(RESULT::SesameOil);
+            emit classificationForResult(RESULT::SesameOil, res);
         } else if (res == "葵花籽油") {
-            emit classificationForResult(RESULT::SunflowerOil);
+            emit classificationForResult(RESULT::SunflowerOil, res);
         } else if (res == "75酒精") {
-            emit classificationForResult(RESULT::Alcohol75);
+            emit classificationForResult(RESULT::Alcohol75, res);
         } else if (res == "C2H4O2") {
-            emit classificationForResult(RESULT::C2H4O2);
+            emit classificationForResult(RESULT::C2H4O2, res);
         } else if (res == "C2H6O") {
-            emit classificationForResult(RESULT::C2H6O);
+            emit classificationForResult(RESULT::C2H6O, res);
         } else if (res == "玉米油") {
-            emit classificationForResult(RESULT::CornOil);
+            emit classificationForResult(RESULT::CornOil, res);
         } else if (res == "空瓶") {
-            emit classificationForResult(RESULT::EmptyBottle);
+            emit classificationForResult(RESULT::EmptyBottle, res);
+        } else {
+            emit classificationForResult(RESULT::Empty, res);
         }
 
         emit classificationForHistory(obj);

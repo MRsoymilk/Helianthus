@@ -28,7 +28,7 @@ signals:
                           const double &xMax,
                           const double &yMin,
                           const double &yMax);
-    void classificationForResult(RESULT result);
+    void classificationForResult(RESULT result, const QString &name);
     void classificationForHistory(const QJsonObject &obj);
     void otoRequestRaw(const QJsonObject &obj);
     void otoBaselineProgress(const QString &progress);

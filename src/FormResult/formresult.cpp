@@ -46,8 +46,9 @@ static QString resultToLocalFileUrl(RESULT result)
     return QUrl::fromLocalFile(filePath).toString();
 }
 
-void FormResult::showResult(RESULT result)
+void FormResult::showResult(RESULT result, const QString &name)
 {
+    ui->labelResult->setText(name);
     if (result == lastResult)
         return;
     lastResult = result;
