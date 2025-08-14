@@ -56,6 +56,10 @@ const QString CFG_GROUP_OTO = "OTO";
 const QString CFG_OTO_INFO = "info";
 const QString CFG_OTO_SPECTRUM = "spectrum";
 
+const QString CFG_GROUP_FILTER = "Filter";
+const QString CFG_FILTER_AVERAGE = "average";
+const QString CFG_FILTER_DISTANCE = "distance";
+
 const QString CFG_GROUP_REFLECTION = "Reflection";
 const QString CFG_GROUP_TRANSMISSION = "Transmission";
 const QString CFG_INTEGRATION = "integration";

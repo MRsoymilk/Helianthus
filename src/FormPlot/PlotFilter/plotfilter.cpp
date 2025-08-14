@@ -1,4 +1,5 @@
 #include "plotfilter.h"
+#include "g_define.h"
 #include "ui_plotfilter.h"
 
 PlotFilter::PlotFilter(QWidget *parent)
@@ -8,6 +9,9 @@ PlotFilter::PlotFilter(QWidget *parent)
     ui->setupUi(this);
     m_filter = false;
     ui->btnFilter->setCheckable(true);
+    ui->lineEditFilterAverage->setText(SETTING_CONFIG_GET(CFG_GROUP_FILTER, CFG_FILTER_AVERAGE, ""));
+    ui->lineEditFilterDistance->setText(
+        SETTING_CONFIG_GET(CFG_GROUP_FILTER, CFG_FILTER_DISTANCE, ""));
 }
 
 PlotFilter::~PlotFilter()
@@ -49,8 +53,11 @@ void PlotFilter::on_btnFilter_clicked()
     ui->btnFilter->setChecked(m_filter);
     if (m_filter) {
         ui->btnFilter->setText("On Filter");
-        emit sendFilter(ui->lineEditFilterAverage->text().toDouble(),
-                        ui->lineEditFilterDistance->text().toDouble());
+        QString avg = ui->lineEditFilterAverage->text();
+        QString dist = ui->lineEditFilterDistance->text();
+        SETTING_CONFIG_SET(CFG_GROUP_FILTER, CFG_FILTER_AVERAGE, avg);
+        SETTING_CONFIG_SET(CFG_GROUP_FILTER, CFG_FILTER_DISTANCE, dist);
+        emit sendFilter(avg.toDouble(), dist.toDouble());
     } else {
         ui->btnFilter->setText("Filter");
     }
