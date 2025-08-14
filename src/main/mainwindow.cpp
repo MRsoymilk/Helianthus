@@ -68,7 +68,18 @@ void MainWindow::init()
     connect(m_plot, &FormPlot::sendPlotIntegration, m_worker, &ThreadWorker::onPlotIntegration);
     connect(m_plot, &FormPlot::sendPlotBaselineSub, m_worker, &ThreadWorker::onPlotSubBaseline);
     connect(m_plot, &FormPlot::sendPlotClassify, m_worker, &ThreadWorker::onPlotClassify);
+    connect(m_plot, &FormPlot::sendPlotSeparation, m_worker, &ThreadWorker::onPlotSeparation);
+    connect(m_plot,
+            &FormPlot::sendSeparationStandard,
+            m_worker,
+            &ThreadWorker::onPlotSeparationStandard);
+
     connect(m_worker, &ThreadWorker::sendLineInfo, m_plot, &FormPlot::onSendLineInfo);
+    connect(m_worker,
+            &ThreadWorker::sendSeparationSeries,
+            m_plot,
+            &FormPlot::onSendSeparationSeries);
+    connect(m_worker, &ThreadWorker::sendSeparationInfo, m_plot, &FormPlot::onSendSeparationInfo);
     connect(m_plot, &FormPlot::sendFilter, m_worker, &ThreadWorker::onSendFilter);
     connect(m_worker, &ThreadWorker::classificationForResult, m_result, &FormResult::showResult);
     connect(m_worker,

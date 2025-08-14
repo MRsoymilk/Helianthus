@@ -2,6 +2,7 @@
 #include "PlotData/plotdata.h"
 #include "PlotFilter/plotfilter.h"
 #include "PlotHistory/plothistory.h"
+#include "PlotSeparation/plotseparation.h"
 #include "g_define.h"
 #include "ui_formplot.h"
 
@@ -71,6 +72,16 @@ void FormPlot::onSendLineInfo(const double &val_average, const double &val_dista
     }
 }
 
+void FormPlot::onSendSeparationSeries(const QList<QPointF> v, const QString &name)
+{
+    m_plotSeparation->setSeparationSeries(v, name);
+}
+
+void FormPlot::onSendSeparationInfo(const double &sugar, const double &salt)
+{
+    m_plotSeparation->setSeparationInfo(sugar, salt);
+}
+
 void FormPlot::init()
 {
     m_series24 = new QLineSeries();
@@ -115,6 +126,7 @@ void FormPlot::init()
     m_baseline_sub = false;
     m_classify = false;
     m_showFilter = false;
+    m_showSeparation = false;
     ui->tBtnZoom->setCheckable(true);
     ui->tBtnZoom->setChecked(m_autoZoom);
     ui->tBtnHistory->setCheckable(true);
@@ -122,6 +134,7 @@ void FormPlot::init()
     ui->tBtnBaselineSubtraction->setCheckable(true);
     ui->tBtnClassify->setCheckable(true);
     ui->tBtnFilter->setCheckable(true);
+    ui->tBtnSeparation->setCheckable(true);
 
     m_plotData = new PlotData;
     connect(this, &FormPlot::send2PlotData, m_plotData, &PlotData::updateTable);
@@ -136,6 +149,15 @@ void FormPlot::init()
     connect(m_plotFilter, &PlotFilter::windowClose, this, [&]() {
         m_showFilter = false;
         ui->tBtnFilter->setChecked(m_showFilter);
+    });
+
+    m_plotSeparation = new PlotSeparation;
+    connect(m_plotSeparation, &PlotSeparation::windowClose, this, [&]() {
+        m_showSeparation = false;
+        ui->tBtnSeparation->setChecked(m_showSeparation);
+    });
+    connect(m_plotSeparation, &PlotSeparation::sendSeparationStandard, this, [&]() {
+        emit sendSeparationStandard();
     });
 
     ui->comboBoxMethod->addItems({tr("Reflection"), tr("Transmission")});
@@ -327,5 +349,17 @@ void FormPlot::on_tBtnFilter_clicked()
         m_plotFilter->show();
     } else {
         m_plotFilter->hide();
+    }
+}
+
+void FormPlot::on_tBtnSeparation_clicked()
+{
+    m_showSeparation = !m_showSeparation;
+    ui->tBtnSeparation->setChecked(m_showSeparation);
+    emit sendPlotSeparation(m_showSeparation);
+    if (m_showSeparation) {
+        m_plotSeparation->show();
+    } else {
+        m_plotSeparation->hide();
     }
 }

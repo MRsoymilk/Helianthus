@@ -11,6 +11,7 @@
 ThreadWorker::ThreadWorker(QObject *parent)
     : QObject(parent)
 {
+    m_plot_separation = false;
     m_plot_classify = false;
     m_plot_start = m_plot_end = 0;
     m_plot_integration = 0;
@@ -144,6 +145,11 @@ void ThreadWorker::onPlotClassify(bool isDo)
     m_plot_classify = isDo;
 }
 
+void ThreadWorker::onPlotSeparation(bool isDo)
+{
+    m_plot_separation = isDo;
+}
+
 void ThreadWorker::onSendFilter(const double &average, const double &distance)
 {
     m_filter_average = average;
@@ -246,6 +252,9 @@ void ThreadWorker::otoRequest()
             emit classificationForResult(RESULT::Empty, "Filtered");
         }
     }
+    if (m_plot_separation) {
+        sendSeparationRequest(v_voltage24);
+    }
 }
 
 void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
@@ -301,6 +310,65 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
         }
 
         emit classificationForHistory(obj);
+        cleanup();
+    });
+
+    connect(http, &MyHttp::httpError, this, [=](const QString &err) {
+        qWarning() << "HTTP error:" << err;
+        cleanup();
+    });
+
+    http->postJson(url, inputObj);
+}
+
+void ThreadWorker::onPlotSeparationStandard()
+{
+    MyHttp http;
+    QJsonObject obj = http.get_sync("http://192.168.123.233:5015/standard");
+    auto toPoints = [](const QJsonArray &arr) {
+        QList<QPointF> points;
+        points.reserve(arr.size());
+        for (int i = 0; i < arr.size(); ++i) {
+            points.append(QPointF(i, arr[i].toDouble()));
+        }
+        return points;
+    };
+    emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()), "StandardSugar");
+    emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()), "StandardSalt");
+}
+
+void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
+{
+    QJsonObject inputObj;
+    QJsonArray signalArray;
+    for (double val : v_voltage24)
+        signalArray.append(val);
+    inputObj["signal"] = signalArray;
+
+    MyHttp *http = new MyHttp(this);
+    QUrl url("http://192.168.123.233:5015/predict");
+
+    auto cleanup = [http]() { http->deleteLater(); };
+
+    connect(http, &MyHttp::jsonResponse, this, [=](const QJsonObject &obj) {
+        QJsonObject predRatio = obj["pred_ratio"].toObject();
+        double sugarRatio = predRatio["sugar"].toDouble() * 100;
+        double saltRatio = predRatio["salt"].toDouble() * 100;
+        emit sendSeparationInfo(sugarRatio, saltRatio);
+
+        auto toPoints = [](const QJsonArray &arr) {
+            QList<QPointF> points;
+            points.reserve(arr.size());
+            for (int i = 0; i < arr.size(); ++i) {
+                points.append(QPointF(i, arr[i].toDouble()));
+            }
+            return points;
+        };
+
+        emit sendSeparationSeries(toPoints(obj["mix_curve"].toArray()), "Mix");
+        emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()), "Sugar");
+        emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()), "Salt");
+
         cleanup();
     });
 

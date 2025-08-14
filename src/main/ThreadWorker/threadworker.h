@@ -19,8 +19,9 @@ public slots:
     void onPlotIntegration(int ms);
     void onPlotSubBaseline(bool isDo);
     void onPlotClassify(bool isDo);
+    void onPlotSeparation(bool isDo);
     void onSendFilter(const double &average, const double &distance);
-
+    void onPlotSeparationStandard();
 signals:
     void dataForTableReady(const QVector<double> &v24, const QVector<qint32> &raw24);
     void dataForPlotReady(const QList<QPointF> &v24,
@@ -33,6 +34,8 @@ signals:
     void otoRequestRaw(const QJsonObject &obj);
     void otoBaselineProgress(const QString &progress);
     void sendLineInfo(const double &val_average, const double &val_distance);
+    void sendSeparationSeries(const QList<QPointF> v, const QString &name);
+    void sendSeparationInfo(const double &surgar, const double &salt);
 
 private:
     void processCurve24(const QByteArray &data24,
@@ -41,8 +44,10 @@ private:
                         double &yMin,
                         double &yMax);
     void sendPredictRequest(const QVector<double> &v_voltage24);
+    void sendSeparationRequest(const QVector<double> &v_voltage24);
     void otoRequest();
 
+private:
     QTimer *m_timer;
     QString m_url;
     QString m_base_url;
@@ -53,6 +58,7 @@ private:
     QMap<int, double> m_map_plot_baseline;
     int m_plot_baseline_count;
     bool m_plot_classify;
+    bool m_plot_separation;
     double m_filter_average;
     double m_filter_distance;
 };
