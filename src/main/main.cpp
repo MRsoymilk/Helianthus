@@ -19,6 +19,6 @@ int main(int argc, char *argv[])
 
     a.setWindowIcon(QIcon(":/res/icons/Helianthus.png"));
     MainWindow w;
-    w.show();
+    w.showMaximized();
     return a.exec();
 }
