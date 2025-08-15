@@ -89,19 +89,73 @@ void ThreadWorker::processData(const QByteArray &data24)
     xMax = std::min(xMin + v_voltage24.size(), xMin + 660);
     for (int i = 0; i < v_voltage24.size(); ++i) {
         out24.push_back({static_cast<double>(i + xMin), v_voltage24[i]});
+        if (m_plot_baseline_count > 0) {
+            m_map_plot_baseline[i] += v_voltage24[i];
+        }
+    }
+
+    if (m_plot_baseline_count > 0) {
+        --m_plot_baseline_count;
+    }
+
+    if (m_plot_start != 0) {
+        xMin = m_plot_start;
+    }
+    if (m_plot_end != 0) {
+        xMax = m_plot_end;
+    }
+
+    double val_average = 0;
+    double val_distance = 0;
+
+    if (m_b_plot_sub_baseline && m_plot_baseline_count == 0) {
+        yMin = std::numeric_limits<double>::max();
+        yMax = std::numeric_limits<double>::lowest();
+        // REFLECTION
+        if (m_plot_method == 0) {
+            for (int i = 0; i < v_voltage24.size(); ++i) {
+                v_voltage24[i] -= m_map_plot_baseline[i] / 10;
+            }
+            for (int i = 0; i < out24.size(); ++i) {
+                out24[i].setY(out24[i].y() - m_map_plot_baseline[i] / 10);
+                yMin = std::min(yMin, out24[i].y());
+                yMax = std::max(yMax, out24[i].y());
+            }
+        }
+        // TRANSMISSION
+        else if (m_plot_method == 1) {
+            for (int i = 0; i < v_voltage24.size(); ++i) {
+                v_voltage24[i] = v_voltage24[i] / (m_map_plot_baseline[i] / 10.0) * 100;
+            }
+            for (int i = 0; i < out24.size(); ++i) {
+                out24[i].setY(out24[i].y() / (m_map_plot_baseline[i] / 10.0) * 100);
+                yMax = std::max(yMax, out24[i].y());
+            }
+            yMin = 0;
+        }
+
+        for (int i = 0; i < out24.size(); ++i) {
+            // average
+            val_average += out24[i].y();
+            val_distance += std::abs(out24[i].y());
+        }
+        val_average /= v_voltage24.size();
+        emit sendLineInfo(val_average, val_distance);
     }
 
     emit dataForTableReady(v_voltage24, raw24);
     emit dataForPlotReady(out24, xMin, xMax, yMin, yMax);
 
-    QJsonObject inputObj;
-    QJsonArray signalArray;
-    for (double val : v_voltage24)
-        signalArray.append(val);
-    inputObj["signal"] = signalArray;
-
     if (m_plot_classify) {
-        sendPredictRequest(v_voltage24);
+        if (val_average > m_filter_average && val_distance > m_filter_distance) {
+            sendPredictRequest(v_voltage24);
+        } else {
+            emit classificationForResult(RESULT::Empty, "Filtered");
+        }
+    }
+
+    if (m_plot_separation) {
+        sendSeparationRequest(v_voltage24);
     }
 }
 

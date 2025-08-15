@@ -54,9 +54,7 @@ private slots:
     void on_btnSend_clicked();
     void on_tBtnData_clicked();
     void onSerialDataClose();
-
     void on_tBtnRefresh_clicked();
-
     void on_tBtnIntegration_clicked();
 
 private:

@@ -99,7 +99,7 @@ void FormPlot::init()
 
     m_axisX->setTitleText("wavelength");
     m_axisX->setRange(0, 0.2);
-    m_axisY->setTitleText("wavelength");
+    m_axisY->setTitleText("intensity");
     m_axisY->setRange(m_fixedYMin, m_fixedYMax);
 
     m_chart->legend()->setVisible(true);

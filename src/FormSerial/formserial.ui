@@ -152,7 +152,11 @@
          </attribute>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0">
-           <widget class="QTextEdit" name="textEditSend"/>
+           <widget class="QTextEdit" name="textEditSend">
+            <property name="lineWrapMode">
+             <enum>QTextEdit::LineWrapMode::NoWrap</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

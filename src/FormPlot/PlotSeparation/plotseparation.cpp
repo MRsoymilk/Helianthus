@@ -66,7 +66,7 @@ void PlotSeparation::init()
     m_axisX = new QValueAxis();
     m_axisY = new QValueAxis();
     m_axisX->setTitleText("Index");
-    m_axisY->setTitleText("Wavelength");
+    m_axisY->setTitleText("Intensity");
 
     m_chart->addAxis(m_axisX, Qt::AlignBottom);
     m_chart->addAxis(m_axisY, Qt::AlignLeft);

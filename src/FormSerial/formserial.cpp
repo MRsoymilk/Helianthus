@@ -5,6 +5,7 @@
 
 #include <QFile>
 #include <QSerialPortInfo>
+#include <QTextBlock>
 
 FormSerial::FormSerial(QWidget *parent)
     : QWidget(parent)
@@ -146,7 +147,7 @@ void FormSerial::init()
     QString frame_name = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_NAME, "curve_24bit");
     QString frame_head = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_HEAD, "DE3A096631");
     QString frame_foot = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_FOOT, "CEFF");
-    int frame_length = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_LENGTH, "1612").toInt();
+    int frame_length = SETTING_CONFIG_GET(CFG_GROUP_FRAME, CFG_FRAME_LENGTH, "0").toInt();
     LOG_INFO("frame: {} head: {} - foot: {}, length: {}",
              frame_name,
              frame_head,
@@ -248,7 +249,15 @@ void FormSerial::onReadyRead()
     for (int i = 0; i < data.length(); ++i) {
         to_show.append(QString("%1 ").arg((unsigned char) data[i], 2, 16, QChar('0')).toUpper());
     }
-    ui->textBrowserRecv->append("[RX] " + to_show);
+
+    const int maxLines = 100;
+    if (ui->textBrowserRecv->document()->blockCount() >= maxLines) {
+        QTextBlock firstBlock = ui->textBrowserRecv->document()->begin();
+        QTextCursor cursor(firstBlock);
+        cursor.movePosition(QTextCursor::NextBlock, QTextCursor::KeepAnchor);
+        cursor.removeSelectedText();
+    }
+    ui->textBrowserRecv->append(QString("[RX] %1:\n%2").arg(TIMESTAMP_0()).arg(to_show));
     m_buffer.append(data);
 
     while (true) {
@@ -278,21 +287,35 @@ void FormSerial::onReadyRead()
             LOG_WARN("Dropping invalid data before header: {} bytes", firstHeaderIdx);
             m_buffer.remove(0, firstHeaderIdx);
         }
+        if (current_frame.length != 0) {
+            // 长度固定帧
+            if (m_buffer.size() < current_frame.length)
+                break;
 
-        // 长度固定帧
-        if (m_buffer.size() < current_frame.length)
-            break;
+            QByteArray frame_candidate = m_buffer.left(current_frame.length);
+            if (!frame_candidate.endsWith(current_frame.footer)) {
+                LOG_WARN("Invalid footer (fixed length), removing header only");
+                m_buffer.remove(0, current_frame.header.size());
+                continue;
+            }
 
-        QByteArray frame_candidate = m_buffer.left(current_frame.length);
-        if (!frame_candidate.endsWith(current_frame.footer)) {
-            LOG_WARN("Invalid footer (fixed length), removing header only");
-            m_buffer.remove(0, current_frame.header.size());
-            continue;
+            LOG_INFO("Fixed-length frame matched: {}", current_frame.name.toStdString());
+            handleFrame(current_frame.name, frame_candidate);
+            m_buffer.remove(0, current_frame.length);
+        } else {
+            int footerIdx = m_buffer.indexOf(current_frame.footer, current_frame.header.size());
+            if (footerIdx == -1) {
+                // 没找到帧尾，等待更多数据
+                break;
+            }
+            int frame_len = footerIdx + current_frame.footer.size();
+            QByteArray frame_candidate = m_buffer.left(frame_len);
+            LOG_INFO("Variable-length frame matched: {}, size = {}",
+                     current_frame.name.toStdString(),
+                     frame_len);
+            handleFrame(current_frame.name, frame_candidate);
+            m_buffer.remove(0, frame_len);
         }
-
-        LOG_INFO("Fixed-length frame matched: {}", current_frame.name.toStdString());
-        handleFrame(current_frame.name, frame_candidate);
-        m_buffer.remove(0, current_frame.length);
     }
 }
 
