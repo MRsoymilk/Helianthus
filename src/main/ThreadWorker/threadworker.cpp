@@ -389,6 +389,7 @@ void ThreadWorker::onPlotSeparationStandard()
     };
     emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()), "StandardSugar");
     emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()), "StandardSalt");
+    emit sendSeparationSeries(toPoints(obj["powder_curve"].toArray()), "StandardPowder");
 }
 
 void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
@@ -408,7 +409,8 @@ void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
         QJsonObject predRatio = obj["pred_ratio"].toObject();
         double sugarRatio = predRatio["sugar"].toDouble() * 100;
         double saltRatio = predRatio["salt"].toDouble() * 100;
-        emit sendSeparationInfo(sugarRatio, saltRatio);
+        double powderRatio = predRatio["powder"].toDouble() * 100;
+        emit sendSeparationInfo(sugarRatio, saltRatio, powderRatio);
 
         auto toPoints = [](const QJsonArray &arr) {
             QList<QPointF> points;
@@ -422,6 +424,7 @@ void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
         emit sendSeparationSeries(toPoints(obj["mix_curve"].toArray()), "Mix");
         emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()), "Sugar");
         emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()), "Salt");
+        emit sendSeparationSeries(toPoints(obj["powder_curve"].toArray()), "Powder");
 
         cleanup();
     });

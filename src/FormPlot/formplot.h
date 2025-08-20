@@ -47,7 +47,7 @@ public slots:
     void onSendParams();
     void onSendLineInfo(const double &val_average, const double &val_distance);
     void onSendSeparationSeries(const QList<QPointF> v, const QString &name);
-    void onSendSeparationInfo(const double &sugar, const double &salt);
+    void onSendSeparationInfo(const double &sugar, const double &salt, const double &powder);
 
 protected:
     void wheelEvent(QWheelEvent *event) override;

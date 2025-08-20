@@ -22,7 +22,7 @@ signals:
 
 public:
     void setSeparationSeries(const QList<QPointF> v, const QString &name);
-    void setSeparationInfo(const double &sugar, const double &salt);
+    void setSeparationInfo(const double &sugar, const double &salt, const double &powder);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -36,13 +36,17 @@ private:
 
 private:
     Ui::PlotSeparation *ui;
-    MyChartView *m_chartView = nullptr;
-    QChart *m_chart = nullptr;
+    MyChartView *m_ViewLine = nullptr;
+    QChartView *m_ViewPie = nullptr;
+    QChart *m_chartLine = nullptr;
+    QChart *m_chartPie = nullptr;
     QValueAxis *m_axisX;
     QValueAxis *m_axisY;
-    QLineSeries *m_curve_mix, *m_curve_sugar, *m_curve_salt;
-    QLineSeries *m_base_sugar, *m_base_salt;
+    QLineSeries *m_curve_mix, *m_curve_sugar, *m_curve_salt, *m_curve_powder;
+    QLineSeries *m_base_sugar, *m_base_salt, *m_base_powder;
+    QPieSeries *m_pie;
     bool m_showBase;
+    QMap<int, QString> m_material;
 };
 
 #endif // PLOTSEPARATION_H

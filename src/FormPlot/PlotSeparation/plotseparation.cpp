@@ -13,6 +13,7 @@ PlotSeparation::~PlotSeparation()
 {
     delete ui;
 }
+
 void PlotSeparation::updateAxisRange()
 {
     qreal minX = std::numeric_limits<qreal>::max();
@@ -38,6 +39,7 @@ void PlotSeparation::updateAxisRange()
         m_axisY->setRange(minY * 0.9, maxY * 1.1);
     }
 }
+
 void PlotSeparation::setSeparationSeries(const QList<QPointF> v, const QString &name)
 {
     if (name == "Mix") {
@@ -46,73 +48,120 @@ void PlotSeparation::setSeparationSeries(const QList<QPointF> v, const QString &
         m_curve_sugar->replace(v);
     } else if (name == "Salt") {
         m_curve_salt->replace(v);
+    } else if (name == "Powder") {
+        m_curve_powder->replace(v);
     } else if (name == "StandardSugar") {
         m_base_sugar->replace(v);
     } else if (name == "StandardSalt") {
         m_base_salt->replace(v);
+    } else if (name == "StandardPowder") {
+        m_base_powder->replace(v);
     }
     updateAxisRange();
-    m_chart->update();
+    m_chartLine->update();
 }
 
-void PlotSeparation::setSeparationInfo(const double &sugar, const double &salt)
+void PlotSeparation::setSeparationInfo(const double &sugar, const double &salt, const double &powder)
 {
-    ui->label->setText(tr("sugar: %1%\nsalt: %2%").arg(sugar, 0, 'f', 2).arg(salt, 0, 'f', 2));
+    if (m_pie->slices().size() >= 2) {
+        m_pie->slices().at(0)->setValue(sugar);  // Sugar
+        m_pie->slices().at(1)->setValue(salt);   // Salt
+        m_pie->slices().at(2)->setValue(powder); // Powder
+
+        for (auto slice : m_pie->slices()) {
+            slice->setLabel(QString("%1: %2%").arg(slice->label()).arg(slice->value(), 0, 'f', 2));
+            slice->setLabelVisible(true);
+        }
+    }
 }
 
 void PlotSeparation::init()
 {
-    m_chart = new QChart();
+    m_chartLine = new QChart();
     m_axisX = new QValueAxis();
     m_axisY = new QValueAxis();
     m_axisX->setTitleText("Index");
     m_axisY->setTitleText("Intensity");
 
-    m_chart->addAxis(m_axisX, Qt::AlignBottom);
-    m_chart->addAxis(m_axisY, Qt::AlignLeft);
-    m_chart->legend()->setVisible(true);
-    m_chart->legend()->setAlignment(Qt::AlignBottom);
-    m_chart->setTitle("Separation");
+    m_chartLine->addAxis(m_axisX, Qt::AlignBottom);
+    m_chartLine->addAxis(m_axisY, Qt::AlignLeft);
+    m_chartLine->legend()->setVisible(true);
+    m_chartLine->legend()->setAlignment(Qt::AlignBottom);
+    m_chartLine->setTitle(tr("Separation"));
 
     m_curve_mix = new QLineSeries();
     m_curve_sugar = new QLineSeries();
     m_curve_salt = new QLineSeries();
+    m_curve_powder = new QLineSeries();
 
     m_base_sugar = new QLineSeries();
     m_base_salt = new QLineSeries();
+    m_base_powder = new QLineSeries();
 
-    m_chart->addSeries(m_curve_mix);
+    m_chartLine->addSeries(m_curve_mix);
     m_curve_mix->setName("mix");
     m_curve_mix->attachAxis(m_axisX);
     m_curve_mix->attachAxis(m_axisY);
 
-    m_chart->addSeries(m_curve_sugar);
+    m_chartLine->addSeries(m_curve_sugar);
     m_curve_sugar->setName("sugar");
     m_curve_sugar->attachAxis(m_axisX);
     m_curve_sugar->attachAxis(m_axisY);
 
-    m_chart->addSeries(m_curve_salt);
+    m_chartLine->addSeries(m_curve_salt);
     m_curve_salt->setName("salt");
     m_curve_salt->attachAxis(m_axisX);
     m_curve_salt->attachAxis(m_axisY);
 
-    m_chart->addSeries(m_base_sugar);
+    m_chartLine->addSeries(m_curve_powder);
+    m_curve_powder->setName("powder");
+    m_curve_powder->attachAxis(m_axisX);
+    m_curve_powder->attachAxis(m_axisY);
+
+    m_chartLine->addSeries(m_base_sugar);
     m_base_sugar->setName("base sugar");
     m_base_sugar->attachAxis(m_axisX);
     m_base_sugar->attachAxis(m_axisY);
 
-    m_chart->addSeries(m_base_salt);
+    m_chartLine->addSeries(m_base_salt);
     m_base_salt->setName("base salt");
     m_base_salt->attachAxis(m_axisX);
     m_base_salt->attachAxis(m_axisY);
 
-    m_chartView = new MyChartView(m_chart, this);
-    m_chartView->setRenderHint(QPainter::Antialiasing);
-    ui->gLayPlot->addWidget(m_chartView);
+    m_chartLine->addSeries(m_base_powder);
+    m_base_powder->setName("base powder");
+    m_base_powder->attachAxis(m_axisX);
+    m_base_powder->attachAxis(m_axisY);
 
-    m_chartView->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_ViewLine = new MyChartView(m_chartLine, this);
+    m_ViewLine->setRenderHint(QPainter::Antialiasing);
+    ui->gLayPlot->addWidget(m_ViewLine);
+
+    m_ViewLine->setContextMenuPolicy(Qt::CustomContextMenu);
     m_showBase = false;
     ui->tBtnStandardCurve->setCheckable(true);
+
+    m_material[0] = "Sugar";
+    m_material[1] = "Salt";
+    m_material[2] = "Powder";
+    m_chartPie = new QChart();
+    m_pie = new QPieSeries();
+    m_pie->append(m_material[0], 1.0 / 3 * 100);
+    m_pie->append(m_material[1], 1.0 / 3 * 100);
+    m_pie->append(m_material[2], 1.0 / 3 * 100);
+
+    for (auto slice : m_pie->slices()) {
+        slice->setLabel(QString("%1: %2%").arg(slice->label()).arg(slice->value(), 0, 'f', 2));
+        slice->setLabelVisible(true);
+    }
+
+    m_chartPie->addSeries(m_pie);
+    m_chartPie->setTitle(tr("Proportion"));
+    m_chartPie->legend()->setAlignment(Qt::AlignBottom);
+
+    m_ViewPie = new QChartView(m_chartPie);
+    m_ViewPie->setRenderHint(QPainter::Antialiasing);
+    ui->gLayProportion->addWidget(m_ViewPie);
 }
 
 void PlotSeparation::closeEvent(QCloseEvent *event)

@@ -77,9 +77,9 @@ void FormPlot::onSendSeparationSeries(const QList<QPointF> v, const QString &nam
     m_plotSeparation->setSeparationSeries(v, name);
 }
 
-void FormPlot::onSendSeparationInfo(const double &sugar, const double &salt)
+void FormPlot::onSendSeparationInfo(const double &sugar, const double &salt, const double &powder)
 {
-    m_plotSeparation->setSeparationInfo(sugar, salt);
+    m_plotSeparation->setSeparationInfo(sugar, salt, powder);
 }
 
 void FormPlot::init()
