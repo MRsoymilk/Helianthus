@@ -1,4 +1,5 @@
 #include "plotseparation.h"
+#include "g_define.h"
 #include "ui_plotseparation.h"
 
 PlotSeparation::PlotSeparation(QWidget *parent)
@@ -16,31 +17,49 @@ PlotSeparation::~PlotSeparation()
 
 void PlotSeparation::updateAxisRange()
 {
-    qreal minX = std::numeric_limits<qreal>::max();
-    qreal maxX = std::numeric_limits<qreal>::lowest();
-    qreal minY = std::numeric_limits<qreal>::max();
-    qreal maxY = std::numeric_limits<qreal>::lowest();
+    // X 轴范围统一用所有曲线的最大最小 X
+    double globalMinX = std::numeric_limits<double>::max();
+    double globalMaxX = std::numeric_limits<double>::lowest();
 
-    for (auto series : {m_curve_mix, m_curve_sugar, m_curve_salt, m_base_sugar, m_base_salt}) {
-        if (!series)
-            continue;
-        for (const QPointF &pt : series->points()) {
-            minX = std::min(minX, pt.x());
-            maxX = std::max(maxX, pt.x());
-            minY = std::min(minY, pt.y());
-            maxY = std::max(maxY, pt.y());
+    for (const auto &series : {m_curve_mix,
+                               m_curve_sugar,
+                               m_curve_salt,
+                               m_curve_powder,
+                               m_base_sugar,
+                               m_base_salt,
+                               m_base_powder}) {
+        if (series && !series->points().isEmpty()) {
+            globalMinX = std::min(globalMinX, series->points().first().x());
+            globalMaxX = std::max(globalMaxX, series->points().last().x());
         }
     }
 
-    if (minX < maxX) {
-        m_axisX->setRange(minX, maxX);
+    if (globalMinX < globalMaxX) {
+        m_axisX->setRange(globalMinX, globalMaxX);
     }
-    if (minY < maxY) {
-        m_axisY->setRange(minY * 0.9, maxY * 1.1);
+
+    // Y 轴范围根据 m_mapYmin / m_mapYmax 取整体最小最大
+    if (!m_mapYmin.isEmpty() && !m_mapYmax.isEmpty()) {
+        double minY = std::numeric_limits<double>::max();
+        double maxY = std::numeric_limits<double>::lowest();
+
+        for (auto it = m_mapYmin.begin(); it != m_mapYmin.end(); ++it) {
+            minY = std::min(minY, it.value());
+        }
+        for (auto it = m_mapYmax.begin(); it != m_mapYmax.end(); ++it) {
+            maxY = std::max(maxY, it.value());
+        }
+
+        if (minY < maxY) {
+            m_axisY->setRange(minY * 0.9, maxY * 1.1);
+        }
     }
 }
 
-void PlotSeparation::setSeparationSeries(const QList<QPointF> v, const QString &name)
+void PlotSeparation::setSeparationSeries(const QList<QPointF> v,
+                                         const QString &name,
+                                         const double y_min,
+                                         const double y_max)
 {
     if (name == "Mix") {
         m_curve_mix->replace(v);
@@ -57,21 +76,22 @@ void PlotSeparation::setSeparationSeries(const QList<QPointF> v, const QString &
     } else if (name == "StandardPowder") {
         m_base_powder->replace(v);
     }
+    m_mapYmin[name] = y_min;
+    m_mapYmax[name] = y_max;
     updateAxisRange();
     m_chartLine->update();
 }
 
 void PlotSeparation::setSeparationInfo(const double &sugar, const double &salt, const double &powder)
 {
-    if (m_pie->slices().size() >= 2) {
+    if (m_pie->slices().size() >= 3) {
         m_pie->slices().at(0)->setValue(sugar);  // Sugar
         m_pie->slices().at(1)->setValue(salt);   // Salt
         m_pie->slices().at(2)->setValue(powder); // Powder
 
-        for (auto slice : m_pie->slices()) {
-            slice->setLabel(QString("%1: %2%").arg(slice->label()).arg(slice->value(), 0, 'f', 2));
-            slice->setLabelVisible(true);
-        }
+        m_pie->slices().at(0)->setLabel(QString("Sugar: %1%").arg(sugar, 0, 'f', 2));
+        m_pie->slices().at(1)->setLabel(QString("Salt: %1%").arg(salt, 0, 'f', 2));
+        m_pie->slices().at(2)->setLabel(QString("Powder: %1%").arg(powder, 0, 'f', 2));
     }
 }
 
@@ -150,11 +170,17 @@ void PlotSeparation::init()
     m_pie->append(m_material[1], 1.0 / 3 * 100);
     m_pie->append(m_material[2], 1.0 / 3 * 100);
 
+    m_pie->slices().at(0)->setLabel(QString("Sugar: %1%").arg(1.0 / 3 * 100, 0, 'f', 2));
+    m_pie->slices().at(1)->setLabel(QString("Salt: %1%").arg(1.0 / 3 * 100, 0, 'f', 2));
+    m_pie->slices().at(2)->setLabel(QString("Powder: %1%").arg(1.0 / 3 * 100, 0, 'f', 2));
     for (auto slice : m_pie->slices()) {
-        slice->setLabel(QString("%1: %2%").arg(slice->label()).arg(slice->value(), 0, 'f', 2));
-        slice->setLabelVisible(true);
-    }
+        slice->setLabelVisible(false);
 
+        // 连接悬浮信号
+        connect(slice, &QPieSlice::hovered, this, [slice](bool hovered) {
+            slice->setLabelVisible(hovered);
+        });
+    }
     m_chartPie->addSeries(m_pie);
     m_chartPie->setTitle(tr("Proportion"));
     m_chartPie->legend()->setAlignment(Qt::AlignBottom);

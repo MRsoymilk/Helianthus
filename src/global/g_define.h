@@ -66,6 +66,10 @@ const QString CFG_INTEGRATION = "integration";
 const QString CFG_START = "start";
 const QString CFG_END = "end";
 
+const QString CFG_GROUP_SEPARATION = "Separation";
+const QString CFG_SEPARATION_Y_START = "y_start";
+const QString CFG_SEPARATION_Y_END = "y_end";
+
 const QString VAL_ENABLE = "enalbe";
 const QString VAL_DISABLE = "disable";
 

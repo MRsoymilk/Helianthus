@@ -379,17 +379,32 @@ void ThreadWorker::onPlotSeparationStandard()
 {
     MyHttp http;
     QJsonObject obj = http.get_sync("http://192.168.123.233:5015/standard");
-    auto toPoints = [](const QJsonArray &arr) {
+    double current_min = std::numeric_limits<qreal>::max();
+    double current_max = std::numeric_limits<qreal>::min();
+    auto toPoints = [&](const QJsonArray &arr) {
         QList<QPointF> points;
         points.reserve(arr.size());
+        current_min = std::numeric_limits<qreal>::max();
+        current_max = std::numeric_limits<qreal>::min();
         for (int i = 0; i < arr.size(); ++i) {
             points.append(QPointF(i, arr[i].toDouble()));
+            current_max = qMax(current_max, arr[i].toDouble());
+            current_min = qMin(current_min, arr[i].toDouble());
         }
         return points;
     };
-    emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()), "StandardSugar");
-    emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()), "StandardSalt");
-    emit sendSeparationSeries(toPoints(obj["powder_curve"].toArray()), "StandardPowder");
+    emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()),
+                              "StandardSugar",
+                              current_min,
+                              current_max);
+    emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()),
+                              "StandardSalt",
+                              current_min,
+                              current_max);
+    emit sendSeparationSeries(toPoints(obj["powder_curve"].toArray()),
+                              "StandardPowder",
+                              current_min,
+                              current_max);
 }
 
 void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
@@ -407,24 +422,41 @@ void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
 
     connect(http, &MyHttp::jsonResponse, this, [=](const QJsonObject &obj) {
         QJsonObject predRatio = obj["pred_ratio"].toObject();
-        double sugarRatio = predRatio["sugar"].toDouble() * 100;
-        double saltRatio = predRatio["salt"].toDouble() * 100;
-        double powderRatio = predRatio["powder"].toDouble() * 100;
+        double sugarRatio = predRatio["sugar"].toDouble();
+        double saltRatio = predRatio["salt"].toDouble();
+        double powderRatio = predRatio["powder"].toDouble();
         emit sendSeparationInfo(sugarRatio, saltRatio, powderRatio);
-
-        auto toPoints = [](const QJsonArray &arr) {
+        double current_min = std::numeric_limits<qreal>::max();
+        double current_max = std::numeric_limits<qreal>::min();
+        auto toPoints = [&](const QJsonArray &arr) {
             QList<QPointF> points;
             points.reserve(arr.size());
+            current_min = std::numeric_limits<qreal>::max();
+            current_max = std::numeric_limits<qreal>::min();
             for (int i = 0; i < arr.size(); ++i) {
                 points.append(QPointF(i, arr[i].toDouble()));
+                current_max = qMax(current_max, arr[i].toDouble());
+                current_min = qMin(current_min, arr[i].toDouble());
             }
             return points;
         };
 
-        emit sendSeparationSeries(toPoints(obj["mix_curve"].toArray()), "Mix");
-        emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()), "Sugar");
-        emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()), "Salt");
-        emit sendSeparationSeries(toPoints(obj["powder_curve"].toArray()), "Powder");
+        emit sendSeparationSeries(toPoints(obj["mix_curve"].toArray()),
+                                  "Mix",
+                                  current_min,
+                                  current_max);
+        emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()),
+                                  "Sugar",
+                                  current_min,
+                                  current_max);
+        emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()),
+                                  "Salt",
+                                  current_min,
+                                  current_max);
+        emit sendSeparationSeries(toPoints(obj["powder_curve"].toArray()),
+                                  "Powder",
+                                  current_min,
+                                  current_max);
 
         cleanup();
     });

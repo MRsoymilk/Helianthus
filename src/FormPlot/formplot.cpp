@@ -72,9 +72,12 @@ void FormPlot::onSendLineInfo(const double &val_average, const double &val_dista
     }
 }
 
-void FormPlot::onSendSeparationSeries(const QList<QPointF> v, const QString &name)
+void FormPlot::onSendSeparationSeries(const QList<QPointF> v,
+                                      const QString &name,
+                                      const double y_min,
+                                      const double y_max)
 {
-    m_plotSeparation->setSeparationSeries(v, name);
+    m_plotSeparation->setSeparationSeries(v, name, y_min, y_max);
 }
 
 void FormPlot::onSendSeparationInfo(const double &sugar, const double &salt, const double &powder)

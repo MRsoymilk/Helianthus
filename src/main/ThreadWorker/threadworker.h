@@ -34,7 +34,10 @@ signals:
     void otoRequestRaw(const QJsonObject &obj);
     void otoBaselineProgress(const QString &progress);
     void sendLineInfo(const double &val_average, const double &val_distance);
-    void sendSeparationSeries(const QList<QPointF> v, const QString &name);
+    void sendSeparationSeries(const QList<QPointF> v,
+                              const QString &name,
+                              const double &y_min,
+                              const double &y_max);
     void sendSeparationInfo(const double &surgar, const double &salt, const double &powder);
 
 private:
