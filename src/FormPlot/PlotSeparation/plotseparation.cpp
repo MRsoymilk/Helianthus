@@ -205,4 +205,5 @@ void PlotSeparation::on_tBtnStandardCurve_clicked()
 
     m_base_salt->setVisible(m_showBase);
     m_base_sugar->setVisible(m_showBase);
+    m_base_powder->setVisible(m_showBase);
 }
