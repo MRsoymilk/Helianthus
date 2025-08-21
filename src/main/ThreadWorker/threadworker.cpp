@@ -379,32 +379,31 @@ void ThreadWorker::onPlotSeparationStandard()
 {
     MyHttp http;
     QJsonObject obj = http.get_sync("http://192.168.123.233:5015/standard");
-    double current_min = std::numeric_limits<qreal>::max();
-    double current_max = std::numeric_limits<qreal>::min();
-    auto toPoints = [&](const QJsonArray &arr) {
+
+    auto toPoints = [&](const QJsonArray &arr, QString name) {
         QList<QPointF> points;
         points.reserve(arr.size());
-        current_min = std::numeric_limits<qreal>::max();
-        current_max = std::numeric_limits<qreal>::min();
+        qreal local_min = std::numeric_limits<qreal>::max();
+        qreal local_max = std::numeric_limits<qreal>::min();
+
         for (int i = 0; i < arr.size(); ++i) {
-            points.append(QPointF(i, arr[i].toDouble()));
-            current_max = qMax(current_max, arr[i].toDouble());
-            current_min = qMin(current_min, arr[i].toDouble());
+            double val = arr[i].toDouble();
+            points.append(QPointF(i, val));
+            local_max = qMax(local_max, val);
+            local_min = qMin(local_min, val);
         }
-        return points;
+
+        // 阈值判断：如果曲线接近全 0，就直接跳过
+        if (qFuzzyIsNull(local_max) || qAbs(local_max) < 1e-6) {
+            return; // 不发送
+        }
+
+        emit sendSeparationSeries(points, name, local_min, local_max);
     };
-    emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()),
-                              "StandardSugar",
-                              current_min,
-                              current_max);
-    emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()),
-                              "StandardSalt",
-                              current_min,
-                              current_max);
-    emit sendSeparationSeries(toPoints(obj["powder_curve"].toArray()),
-                              "StandardPowder",
-                              current_min,
-                              current_max);
+
+    toPoints(obj["sugar_curve"].toArray(), "StandardSugar");
+    toPoints(obj["salt_curve"].toArray(), "StandardSalt");
+    toPoints(obj["powder_curve"].toArray(), "StandardPowder");
 }
 
 void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
@@ -426,37 +425,32 @@ void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
         double saltRatio = predRatio["salt"].toDouble();
         double powderRatio = predRatio["powder"].toDouble();
         emit sendSeparationInfo(sugarRatio, saltRatio, powderRatio);
-        double current_min = std::numeric_limits<qreal>::max();
-        double current_max = std::numeric_limits<qreal>::min();
-        auto toPoints = [&](const QJsonArray &arr) {
+        auto toPoints = [&](const QJsonArray &arr, QString name) {
             QList<QPointF> points;
             points.reserve(arr.size());
-            current_min = std::numeric_limits<qreal>::max();
-            current_max = std::numeric_limits<qreal>::min();
+            qreal local_min = std::numeric_limits<qreal>::max();
+            qreal local_max = std::numeric_limits<qreal>::min();
+
             for (int i = 0; i < arr.size(); ++i) {
-                points.append(QPointF(i, arr[i].toDouble()));
-                current_max = qMax(current_max, arr[i].toDouble());
-                current_min = qMin(current_min, arr[i].toDouble());
+                double val = arr[i].toDouble();
+                points.append(QPointF(i, val));
+                local_max = qMax(local_max, val);
+                local_min = qMin(local_min, val);
             }
-            return points;
+
+            // 阈值判断：如果曲线接近全 0，就直接跳过
+            if (qFuzzyIsNull(local_max) || qAbs(local_max) < 1e-6) {
+                return; // 不发送
+            }
+
+            emit sendSeparationSeries(points, name, local_min, local_max);
         };
 
-        emit sendSeparationSeries(toPoints(obj["mix_curve"].toArray()),
-                                  "Mix",
-                                  current_min,
-                                  current_max);
-        emit sendSeparationSeries(toPoints(obj["sugar_curve"].toArray()),
-                                  "Sugar",
-                                  current_min,
-                                  current_max);
-        emit sendSeparationSeries(toPoints(obj["salt_curve"].toArray()),
-                                  "Salt",
-                                  current_min,
-                                  current_max);
-        emit sendSeparationSeries(toPoints(obj["powder_curve"].toArray()),
-                                  "Powder",
-                                  current_min,
-                                  current_max);
+        // 使用时
+        toPoints(obj["mix_curve"].toArray(), "Mix");
+        toPoints(obj["sugar_curve"].toArray(), "Sugar");
+        toPoints(obj["salt_curve"].toArray(), "Salt");
+        toPoints(obj["powder_curve"].toArray(), "Powder");
 
         cleanup();
     });
