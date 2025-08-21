@@ -158,6 +158,7 @@ void FormPlot::init()
     connect(m_plotSeparation, &PlotSeparation::windowClose, this, [&]() {
         m_showSeparation = false;
         ui->tBtnSeparation->setChecked(m_showSeparation);
+        emit sendPlotSeparation(m_showSeparation);
     });
     connect(m_plotSeparation, &PlotSeparation::sendSeparationStandard, this, [&]() {
         emit sendSeparationStandard();
