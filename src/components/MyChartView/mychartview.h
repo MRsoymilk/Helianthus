@@ -160,6 +160,7 @@ protected:
 
         // 查找最近点
         QPointF closestPoint;
+        QString seriesName;
         qreal minDist = std::numeric_limits<qreal>::max();
         for (auto *series : m_chart->series()) {
             auto *xySeries = qobject_cast<QXYSeries *>(series);
@@ -172,6 +173,7 @@ protected:
                 if (dist < minDist) {
                     minDist = dist;
                     closestPoint = p;
+                    seriesName = xySeries->name();
                 }
             }
         }
@@ -191,7 +193,8 @@ protected:
         m_marker->show();
 
         // 坐标文本
-        QString coordText = QString("X: %1\nY: %2")
+        QString coordText = QString("%1\nX: %2\nY: %3")
+                                .arg(seriesName)
                                 .arg(closestPoint.x(), 0, 'f', 3)
                                 .arg(closestPoint.y(), 0, 'f', 3);
         m_coordText->setText(coordText);
