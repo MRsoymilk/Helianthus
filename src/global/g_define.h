@@ -70,6 +70,10 @@ const QString CFG_GROUP_SEPARATION = "Separation";
 const QString CFG_SEPARATION_Y_START = "y_start";
 const QString CFG_SEPARATION_Y_END = "y_end";
 
+const QString CFG_URL = "url";
+const QString CFG_GROUP_TRAIN = "Train";
+const QString CFG_GROUP_CLASSIFY = "Classify";
+
 const QString VAL_ENABLE = "enalbe";
 const QString VAL_DISABLE = "disable";
 

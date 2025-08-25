@@ -49,3 +49,8 @@ pm2 start my_train.py --name my_train --interpreter python --cwd ./my_train
 - `my_train.py`：Self-Train 使用服务
 - `train_knn.py`：训练 knn 模型，对应`knn_predict.py`
 - `train_regression.py`：训练回归模型，对应`composition_separation.py`
+
+## TODO
+
+1. 物质分离接口改变，需要进行修改
+

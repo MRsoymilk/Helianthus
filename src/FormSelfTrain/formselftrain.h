@@ -65,6 +65,7 @@ private:
     QStandardItemModel *m_model;
     QFile m_file;
     QList<QString> m_lastFile;
+    QString m_url;
 };
 
 #endif // FORMSELFTRAIN_H

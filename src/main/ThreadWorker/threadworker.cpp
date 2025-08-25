@@ -22,6 +22,10 @@ ThreadWorker::ThreadWorker(QObject *parent)
     m_self_train_record = false;
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &ThreadWorker::otoRequest);
+    m_url_separation = SETTING_CONFIG_GET(CFG_GROUP_SEPARATION,
+                                          CFG_URL,
+                                          "http://192.168.123.233:5015");
+    m_url_classify = SETTING_CONFIG_GET(CFG_GROUP_CLASSIFY, CFG_URL, "http://192.168.123.233:5010");
 }
 
 ThreadWorker::~ThreadWorker() {}
@@ -331,7 +335,7 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
     inputObj["method"] = m_plot_method == 0 ? "reflection" : "transmission";
 
     MyHttp *http = new MyHttp(this);
-    QUrl url("http://192.168.123.233:5010/knn_predict");
+    QUrl url(QString("%1/knn_predict").arg(m_url_classify));
 
     auto cleanup = [http]() { http->deleteLater(); };
 
@@ -388,7 +392,7 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
 void ThreadWorker::onPlotSeparationStandard()
 {
     MyHttp http;
-    QJsonObject obj = http.get_sync("http://192.168.123.233:5015/standard");
+    QJsonObject obj = http.get_sync(QString("%1/standard").arg(m_url_separation));
 
     auto toPoints = [&](const QJsonArray &arr, QString name) {
         QList<QPointF> points;
@@ -430,7 +434,7 @@ void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
     inputObj["signal"] = signalArray;
 
     MyHttp *http = new MyHttp(this);
-    QUrl url("http://192.168.123.233:5015/predict");
+    QUrl url(QString("%1/predict").arg(m_url_separation));
 
     auto cleanup = [http]() { http->deleteLater(); };
 

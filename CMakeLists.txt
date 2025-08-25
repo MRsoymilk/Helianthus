@@ -71,6 +71,15 @@ set(PROJECT_SOURCES
         src/FormSetting/SerialFrame/serialframe.h
         src/FormSetting/SerialFrame/serialframe.cpp
         src/FormSetting/SerialFrame/serialframe.ui
+        src/FormSetting/TrainSetting/trainsetting.h
+        src/FormSetting/TrainSetting/trainsetting.cpp
+        src/FormSetting/TrainSetting/trainsetting.ui
+        src/FormSetting/ClassifySetting/classifysetting.h
+        src/FormSetting/ClassifySetting/classifysetting.cpp
+        src/FormSetting/ClassifySetting/classifysetting.ui
+        src/FormSetting/SeparationSetting/separationsetting.h
+        src/FormSetting/SeparationSetting/separationsetting.cpp
+        src/FormSetting/SeparationSetting/separationsetting.ui
         src/FormSerial/SerialData/serialdata.h
         src/FormSerial/SerialData/serialdata.cpp
         src/FormSerial/SerialData/serialdata.ui

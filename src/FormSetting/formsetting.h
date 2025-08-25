@@ -5,6 +5,9 @@
 
 class AutoUpdate;
 class SerialFrame;
+class TrainSetting;
+class ClassifySetting;
+class SeparationSetting;
 
 namespace Ui {
 class FormSetting;
@@ -25,6 +28,9 @@ private:
     Ui::FormSetting *ui;
     AutoUpdate *m_update;
     SerialFrame *m_frame;
+    TrainSetting *m_train;
+    ClassifySetting *m_classify;
+    SeparationSetting *m_separation;
 };
 
 #endif // FORMSETTING_H

@@ -110,6 +110,8 @@ void FormSelfTrain::init()
     QStringList methods;
     methods << "knn_reflection" << "knn_transmission" << "regression";
     ui->comboBoxMethod->addItems(methods);
+
+    m_url = SETTING_CONFIG_GET(CFG_GROUP_TRAIN, CFG_URL, "http://192.168.123.233:5050");
 }
 
 void FormSelfTrain::onItemRenamed(QStandardItem *item)
@@ -262,7 +264,7 @@ void FormSelfTrain::on_btnUpload_clicked()
 
     MyHttp *http = new MyHttp(this);
     http->uploadFiles(
-        QUrl("http://192.168.123.233:5050/upload"),
+        QUrl(QString("%1/upload").arg(m_url)),
         filePaths,
         field,
         otherFields,
@@ -280,7 +282,7 @@ void FormSelfTrain::on_btnUpload_clicked()
 
             connect(timer, &QTimer::timeout, this, [this, timer, http, folderName]() {
                 QJsonObject status = http->get_sync(
-                    QString("http://192.168.123.233:5050/train_status/%1").arg(folderName));
+                    QString("%1/train_status/%2").arg(m_url).arg(folderName));
                 QString err = status["stderr"].toString();
                 QString out = status["stdout"].toString();
                 if (!err.isEmpty()) {

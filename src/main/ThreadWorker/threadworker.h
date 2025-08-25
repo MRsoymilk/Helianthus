@@ -72,6 +72,8 @@ private:
     bool m_self_train_record;
     double m_filter_average;
     double m_filter_distance;
+    QString m_url_separation;
+    QString m_url_classify;
 };
 
 #endif // THREADWORKER_H
