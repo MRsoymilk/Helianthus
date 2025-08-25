@@ -25,12 +25,14 @@ private slots:
     void on_btnUpdate_clicked();
 
 private:
+    QJsonObject checkUpdate();
+    bool isNewVersion();
+
+private:
     Ui::AutoUpdate *ui;
     QJsonObject m_objUpdate;
     QString m_url;
     MyHttp *m_http;
-    QJsonObject checkUpdate();
-    bool isNewVersion();
 };
 
 #endif // AUTOUPDATE_H

@@ -22,9 +22,16 @@ public slots:
     void onPlotSeparation(bool isDo);
     void onSendFilter(const double &average, const double &distance);
     void onPlotSeparationStandard();
+    void onSelfTrainRecord(bool isDo);
+
 signals:
     void dataForTableReady(const QVector<double> &v24, const QVector<qint32> &raw24);
     void dataForPlotReady(const QList<QPointF> &v24,
+                          const double &xMin,
+                          const double &xMax,
+                          const double &yMin,
+                          const double &yMax);
+    void dataForSelfTrain(const QList<QPointF> &v24,
                           const double &xMin,
                           const double &xMax,
                           const double &yMin,
@@ -62,6 +69,7 @@ private:
     int m_plot_baseline_count;
     bool m_plot_classify;
     bool m_plot_separation;
+    bool m_self_train_record;
     double m_filter_average;
     double m_filter_distance;
 };

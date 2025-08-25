@@ -19,6 +19,7 @@ ThreadWorker::ThreadWorker(QObject *parent)
     m_map_plot_baseline.clear();
     m_plot_baseline_count = 0;
     m_b_plot_sub_baseline = false;
+    m_self_train_record = false;
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &ThreadWorker::otoRequest);
 }
@@ -145,6 +146,10 @@ void ThreadWorker::processData(const QByteArray &data24)
 
     emit dataForTableReady(v_voltage24, raw24);
     emit dataForPlotReady(out24, xMin, xMax, yMin, yMax);
+
+    if (m_self_train_record) {
+        emit dataForSelfTrain(out24, xMin, xMax, yMin, yMax);
+    }
 
     if (m_plot_classify) {
         if (val_average > m_filter_average && val_distance > m_filter_distance) {
@@ -299,6 +304,11 @@ void ThreadWorker::otoRequest()
 
     emit dataForTableReady(v_voltage24, raw24);
     emit dataForPlotReady(out24, xMin, xMax, yMin, yMax);
+
+    if (m_self_train_record) {
+        emit dataForSelfTrain(out24, xMin, xMax, yMin, yMax);
+    }
+
     if (m_plot_classify) {
         if (val_average > m_filter_average && val_distance > m_filter_distance) {
             sendPredictRequest(v_voltage24);
@@ -404,6 +414,11 @@ void ThreadWorker::onPlotSeparationStandard()
     toPoints(obj["sugar_curve"].toArray(), "StandardSugar");
     toPoints(obj["salt_curve"].toArray(), "StandardSalt");
     toPoints(obj["powder_curve"].toArray(), "StandardPowder");
+}
+
+void ThreadWorker::onSelfTrainRecord(bool isDo)
+{
+    m_self_train_record = isDo;
 }
 
 void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)

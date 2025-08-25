@@ -38,6 +38,7 @@ private slots:
     void on_btnHistory_clicked();
     void on_tBtnPin_clicked();
     void on_btnSetting_clicked();
+    void on_btnSelfTrain_clicked();
 
 private:
     void init();

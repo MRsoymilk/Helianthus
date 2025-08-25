@@ -16,6 +16,7 @@ class FormResult;
 class FormSerial;
 class FormOTO;
 class FormSetting;
+class FormSelfTrain;
 class ThreadWorker;
 
 class MainWindow : public QMainWindow
@@ -28,6 +29,9 @@ public:
 
 public slots:
     void onSwitchForm(FORM f);
+
+protected:
+    void resizeEvent(QResizeEvent *event);
 
 private:
     void init();
@@ -42,10 +46,8 @@ private:
     FormSerial *m_serial;
     FormOTO *m_oto;
     FormSetting *m_setting;
+    FormSelfTrain *m_selfTrain;
     QThread *m_workerThread;
     ThreadWorker *m_worker;
-
-protected:
-    void resizeEvent(QResizeEvent *event);
 };
 #endif // MAINWINDOW_H

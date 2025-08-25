@@ -1,6 +1,9 @@
 #include "myhttp.h"
 #include <QDebug>
 #include <QEventLoop>
+#include <QFile>
+#include <QFileInfo>
+#include <QHttpMultiPart>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkReply>
@@ -112,4 +115,75 @@ QJsonObject MyHttp::get_sync(const QString &url)
 
     reply->deleteLater();
     return result;
+}
+void MyHttp::uploadFiles(const QUrl &url,
+                         const QStringList &filePaths,
+                         const QString &fieldName,
+                         const QMap<QString, QString> &extraFields,
+                         std::function<void(const QJsonObject &)> onSuccess,
+                         std::function<void(const QString &)> onError,
+                         std::function<void(qint64, qint64)> onProgress)
+{
+    if (filePaths.isEmpty()) {
+        if (onError)
+            onError("No files to upload");
+        return;
+    }
+
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+
+    // 添加文件
+    for (const QString &filePath : filePaths) {
+        QFile *file = new QFile(filePath);
+        if (!file->open(QIODevice::ReadOnly)) {
+            if (onError)
+                onError(QString("Cannot open file: %1").arg(filePath));
+            delete file;
+            continue;
+        }
+
+        QHttpPart filePart;
+        QString fileName = QFileInfo(filePath).fileName();
+        QString encodedFileName = QUrl::toPercentEncoding(fileName);
+
+        filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                           QVariant(QString("form-data; name=\"%1\"; filename*=UTF-8''%2")
+                                        .arg(fieldName)
+                                        .arg(encodedFileName)));
+        filePart.setBodyDevice(file);
+        file->setParent(multiPart); // multiPart 会删除 file
+        multiPart->append(filePart);
+    }
+
+    // 添加额外字段
+    for (auto it = extraFields.constBegin(); it != extraFields.constEnd(); ++it) {
+        QHttpPart textPart;
+        textPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                           QVariant(QString("form-data; name=\"%1\"").arg(it.key())));
+        textPart.setBody(it.value().toUtf8());
+        multiPart->append(textPart);
+    }
+
+    QNetworkRequest request(url);
+    QNetworkReply *reply = m_manager->post(request, multiPart);
+    multiPart->setParent(reply); // reply 会删除 multiPart
+
+    if (onProgress) {
+        connect(reply,
+                &QNetworkReply::uploadProgress,
+                this,
+                [onProgress](qint64 sent, qint64 total) { onProgress(sent, total); });
+    }
+
+    connect(reply, &QNetworkReply::finished, this, [reply, onSuccess, onError]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray data = reply->readAll();
+            QJsonDocument doc = QJsonDocument::fromJson(data);
+            if (doc.isObject() && onSuccess)
+                onSuccess(doc.object());
+        } else if (onError) {
+            onError(reply->errorString());
+        }
+        reply->deleteLater();
+    });
 }

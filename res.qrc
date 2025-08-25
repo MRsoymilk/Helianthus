@@ -34,5 +34,6 @@
         <file>res/icons/Helianthus.png</file>
         <file>res/icons/Helianthus.ico</file>
         <file>res/icons/interface.png</file>
+        <file>res/icons/self-train.png</file>
     </qresource>
 </RCC>

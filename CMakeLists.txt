@@ -77,6 +77,9 @@ set(PROJECT_SOURCES
         src/FormOTO/formoto.h
         src/FormOTO/formoto.cpp
         src/FormOTO/formoto.ui
+        src/FormSelfTrain/formselftrain.h
+        src/FormSelfTrain/formselftrain.cpp
+        src/FormSelfTrain/formselftrain.ui
         src/tools/Integration/integration.h
         src/tools/Integration/integration.cpp
         src/tools/Integration/integration.ui

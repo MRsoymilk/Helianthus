@@ -35,12 +35,14 @@ void FlowPanel::init()
     setLeftIconButton(ui->btnResult);
     setLeftIconButton(ui->btnHistory);
     setLeftIconButton(ui->btnSetting);
+    setLeftIconButton(ui->btnSelfTrain);
     ui->btnSerial->setIcon(QIcon(":/res/icons/serial.png"));
     ui->btnOTO->setIcon(QIcon(":/res/icons/interface.png"));
     ui->btnPlot->setIcon(QIcon(":/res/icons/plot.png"));
     ui->btnResult->setIcon(QIcon(":/res/icons/result.png"));
     ui->btnHistory->setIcon(QIcon(":/res/icons/history.png"));
     ui->btnSetting->setIcon(QIcon(":/res/icons/setting.png"));
+    ui->btnSelfTrain->setIcon(QIcon(":/res/icons/self-train.png"));
 
     this->setObjectName("FlowPanel");
     setAttribute(Qt::WA_StyledBackground, true);
@@ -184,4 +186,9 @@ void FlowPanel::on_tBtnPin_clicked()
         animation->setEndValue(QPoint(parentWidget()->width() - m_visual_size, 0));
         animation->start();
     }
+}
+
+void FlowPanel::on_btnSelfTrain_clicked()
+{
+    emit switchForm(FORM::SELF_TRAIN);
 }

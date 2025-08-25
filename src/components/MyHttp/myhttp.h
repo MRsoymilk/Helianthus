@@ -17,6 +17,13 @@ public:
                         std::function<void(QString)> onError,
                         std::function<void(qint64, qint64)> onProgress);
     QJsonObject get_sync(const QString &url);
+    void uploadFiles(const QUrl &url,
+                     const QStringList &filePaths,
+                     const QString &fieldName = "file",
+                     const QMap<QString, QString> &extraFields = {},
+                     std::function<void(const QJsonObject &)> onSuccess = nullptr,
+                     std::function<void(const QString &)> onError = nullptr,
+                     std::function<void(qint64, qint64)> onProgress = nullptr);
 signals:
     void jsonResponse(const QJsonObject &obj);
     void httpError(const QString &error);

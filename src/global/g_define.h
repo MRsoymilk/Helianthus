@@ -3,7 +3,7 @@
 
 #include <QString>
 
-enum class FORM { SERIAL = 0, OTO, RESULT, PLOT, HISTORY, SETTING };
+enum class FORM { SERIAL = 0, OTO, RESULT, PLOT, HISTORY, SELF_TRAIN, SETTING };
 enum class RESULT {
     Empty = 0,
     Starch,
