@@ -21,11 +21,11 @@ signals:
     void sendSeparationStandard();
 
 public:
-    void setSeparationSeries(const QList<QPointF> v,
+    void setSeparationSeries(const QList<QPointF> &v,
                              const QString &name,
                              const double y_min,
                              const double y_max);
-    void setSeparationInfo(const double &sugar, const double &salt, const double &powder);
+    void setSeparationInfo(QMap<QString, double> ratios);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -45,11 +45,9 @@ private:
     QChart *m_chartPie = nullptr;
     QValueAxis *m_axisX;
     QValueAxis *m_axisY;
-    QLineSeries *m_curve_mix, *m_curve_sugar, *m_curve_salt, *m_curve_powder;
-    QLineSeries *m_base_sugar, *m_base_salt, *m_base_powder;
+    QMap<QString, QLineSeries *> m_curveMap;
     QPieSeries *m_pie;
     bool m_showBase;
-    QMap<int, QString> m_material;
     QMap<QString, double> m_mapYmin;
     QMap<QString, double> m_mapYmax;
 };

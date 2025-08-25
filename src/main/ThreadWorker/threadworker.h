@@ -45,7 +45,7 @@ signals:
                               const QString &name,
                               const double &y_min,
                               const double &y_max);
-    void sendSeparationInfo(const double &surgar, const double &salt, const double &powder);
+    void sendSeparationInfo(QMap<QString, double> ratios);
 
 private:
     void processCurve24(const QByteArray &data24,
@@ -56,6 +56,7 @@ private:
     void sendPredictRequest(const QVector<double> &v_voltage24);
     void sendSeparationRequest(const QVector<double> &v_voltage24);
     void otoRequest();
+    void toPoints(const QJsonArray &arr, QString name);
 
 private:
     QTimer *m_timer;

@@ -50,7 +50,7 @@ public slots:
                                 const QString &name,
                                 const double y_min,
                                 const double y_max);
-    void onSendSeparationInfo(const double &sugar, const double &salt, const double &powder);
+    void onSendSeparationInfo(QMap<QString, double> ratios);
 
 protected:
     void wheelEvent(QWheelEvent *event) override;

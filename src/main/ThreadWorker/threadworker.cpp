@@ -389,35 +389,36 @@ void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
     http->postJson(url, inputObj);
 }
 
+void ThreadWorker::toPoints(const QJsonArray &arr, QString name)
+{
+    QList<QPointF> points;
+    points.reserve(arr.size());
+    qreal local_min = std::numeric_limits<qreal>::max();
+    qreal local_max = std::numeric_limits<qreal>::min();
+
+    for (int i = 0; i < arr.size(); ++i) {
+        double val = arr[i].toDouble();
+        points.append(QPointF(i, val));
+        local_max = qMax(local_max, val);
+        local_min = qMin(local_min, val);
+    }
+
+    // 阈值判断：如果曲线接近全 0，就直接跳过
+    if (qFuzzyIsNull(local_max) || qAbs(local_max) < 1e-6) {
+        return; // 不发送
+    }
+
+    emit sendSeparationSeries(points, name, local_min, local_max);
+}
+
 void ThreadWorker::onPlotSeparationStandard()
 {
     MyHttp http;
     QJsonObject obj = http.get_sync(QString("%1/standard").arg(m_url_separation));
 
-    auto toPoints = [&](const QJsonArray &arr, QString name) {
-        QList<QPointF> points;
-        points.reserve(arr.size());
-        qreal local_min = std::numeric_limits<qreal>::max();
-        qreal local_max = std::numeric_limits<qreal>::min();
-
-        for (int i = 0; i < arr.size(); ++i) {
-            double val = arr[i].toDouble();
-            points.append(QPointF(i, val));
-            local_max = qMax(local_max, val);
-            local_min = qMin(local_min, val);
-        }
-
-        // 阈值判断：如果曲线接近全 0，就直接跳过
-        if (qFuzzyIsNull(local_max) || qAbs(local_max) < 1e-6) {
-            return; // 不发送
-        }
-
-        emit sendSeparationSeries(points, name, local_min, local_max);
-    };
-
-    toPoints(obj["sugar_curve"].toArray(), "StandardSugar");
-    toPoints(obj["salt_curve"].toArray(), "StandardSalt");
-    toPoints(obj["powder_curve"].toArray(), "StandardPowder");
+    for (auto key : obj.keys()) {
+        toPoints(obj[key].toArray(), key + "_base");
+    }
 }
 
 void ThreadWorker::onSelfTrainRecord(bool isDo)
@@ -440,36 +441,18 @@ void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)
 
     connect(http, &MyHttp::jsonResponse, this, [=](const QJsonObject &obj) {
         QJsonObject predRatio = obj["pred_ratio"].toObject();
-        double sugarRatio = predRatio["sugar"].toDouble();
-        double saltRatio = predRatio["salt"].toDouble();
-        double powderRatio = predRatio["powder"].toDouble();
-        emit sendSeparationInfo(sugarRatio, saltRatio, powderRatio);
-        auto toPoints = [&](const QJsonArray &arr, QString name) {
-            QList<QPointF> points;
-            points.reserve(arr.size());
-            qreal local_min = std::numeric_limits<qreal>::max();
-            qreal local_max = std::numeric_limits<qreal>::min();
 
-            for (int i = 0; i < arr.size(); ++i) {
-                double val = arr[i].toDouble();
-                points.append(QPointF(i, val));
-                local_max = qMax(local_max, val);
-                local_min = qMin(local_min, val);
-            }
+        QMap<QString, double> ratios;
+        for (const auto key : predRatio.keys()) {
+            ratios[key] = predRatio[key].toDouble();
+        }
+        emit sendSeparationInfo(ratios);
 
-            // 阈值判断：如果曲线接近全 0，就直接跳过
-            if (qFuzzyIsNull(local_max) || qAbs(local_max) < 1e-6) {
-                return; // 不发送
-            }
-
-            emit sendSeparationSeries(points, name, local_min, local_max);
-        };
-
-        // 使用时
-        toPoints(obj["mix_curve"].toArray(), "Mix");
-        toPoints(obj["sugar_curve"].toArray(), "Sugar");
-        toPoints(obj["salt_curve"].toArray(), "Salt");
-        toPoints(obj["powder_curve"].toArray(), "Powder");
+        QJsonObject objCurves = obj["separated_curves"].toObject();
+        for (const auto key : objCurves.keys()) {
+            toPoints(objCurves[key].toArray(), key);
+        }
+        toPoints(obj["mix_curve"].toArray(), "mix_curve");
 
         cleanup();
     });

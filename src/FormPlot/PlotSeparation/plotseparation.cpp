@@ -21,13 +21,7 @@ void PlotSeparation::updateAxisRange()
     double globalMinX = std::numeric_limits<double>::max();
     double globalMaxX = std::numeric_limits<double>::lowest();
 
-    for (const auto &series : {m_curve_mix,
-                               m_curve_sugar,
-                               m_curve_salt,
-                               m_curve_powder,
-                               m_base_sugar,
-                               m_base_salt,
-                               m_base_powder}) {
+    for (const auto &series : m_curveMap) {
         if (series && !series->points().isEmpty()) {
             globalMinX = std::min(globalMinX, series->points().first().x());
             globalMaxX = std::max(globalMaxX, series->points().last().x());
@@ -44,9 +38,19 @@ void PlotSeparation::updateAxisRange()
         double maxY = std::numeric_limits<double>::lowest();
 
         for (auto it = m_mapYmin.begin(); it != m_mapYmin.end(); ++it) {
+            if (!m_showBase) {
+                if (it.key().endsWith("_base")) {
+                    continue;
+                }
+            }
             minY = std::min(minY, it.value());
         }
         for (auto it = m_mapYmax.begin(); it != m_mapYmax.end(); ++it) {
+            if (!m_showBase) {
+                if (it.key().endsWith("_base")) {
+                    continue;
+                }
+            }
             maxY = std::max(maxY, it.value());
         }
 
@@ -56,42 +60,75 @@ void PlotSeparation::updateAxisRange()
     }
 }
 
-void PlotSeparation::setSeparationSeries(const QList<QPointF> v,
+void PlotSeparation::setSeparationSeries(const QList<QPointF> &v,
                                          const QString &name,
                                          const double y_min,
                                          const double y_max)
 {
-    if (name == "Mix") {
-        m_curve_mix->replace(v);
-    } else if (name == "Sugar") {
-        m_curve_sugar->replace(v);
-    } else if (name == "Salt") {
-        m_curve_salt->replace(v);
-    } else if (name == "Powder") {
-        m_curve_powder->replace(v);
-    } else if (name == "StandardSugar") {
-        m_base_sugar->replace(v);
-    } else if (name == "StandardSalt") {
-        m_base_salt->replace(v);
-    } else if (name == "StandardPowder") {
-        m_base_powder->replace(v);
+    QLineSeries *series = nullptr;
+
+    if (!m_curveMap.contains(name)) {
+        // 如果不存在，动态创建
+        series = new QLineSeries();
+        series->setName(name);
+        m_chartLine->addSeries(series);
+        series->attachAxis(m_axisX);
+        series->attachAxis(m_axisY);
+        m_curveMap[name] = series;
+    } else {
+        series = m_curveMap[name];
     }
+
+    series->replace(v);
     m_mapYmin[name] = y_min;
     m_mapYmax[name] = y_max;
+
     updateAxisRange();
-    m_chartLine->update();
 }
 
-void PlotSeparation::setSeparationInfo(const double &sugar, const double &salt, const double &powder)
+void PlotSeparation::setSeparationInfo(QMap<QString, double> ratios)
 {
-    if (m_pie->slices().size() >= 3) {
-        m_pie->slices().at(0)->setValue(sugar);  // Sugar
-        m_pie->slices().at(1)->setValue(salt);   // Salt
-        m_pie->slices().at(2)->setValue(powder); // Powder
+    // 遍历已有 slice，更新值
+    for (auto slice : m_pie->slices()) {
+        QString key = slice->label().section(":", 0, 0); // 取出 key（冒号前的部分）
+        if (ratios.contains(key)) {
+            double newVal = ratios.value(key);
+            slice->setValue(newVal);
+            slice->setLabel(QString("%1: %2%").arg(key).arg(newVal, 0, 'f', 2));
+        }
+    }
 
-        m_pie->slices().at(0)->setLabel(QString("Sugar: %1%").arg(sugar, 0, 'f', 2));
-        m_pie->slices().at(1)->setLabel(QString("Salt: %1%").arg(salt, 0, 'f', 2));
-        m_pie->slices().at(2)->setLabel(QString("Powder: %1%").arg(powder, 0, 'f', 2));
+    // 检查新增的 key
+    for (auto it = ratios.begin(); it != ratios.end(); ++it) {
+        bool exists = false;
+        for (auto slice : m_pie->slices()) {
+            if (slice->label().startsWith(it.key() + ":")) {
+                exists = true;
+                break;
+            }
+        }
+
+        if (!exists) {
+            auto slice = m_pie->append(it.key(), it.value());
+            slice->setLabel(QString("%1: %2%").arg(it.key()).arg(it.value(), 0, 'f', 2));
+            slice->setLabelVisible(false);
+
+            connect(slice, &QPieSlice::hovered, this, [slice](bool hovered) {
+                slice->setLabelVisible(hovered);
+            });
+        }
+    }
+
+    // 检查需要删除的 key（在 ratios 中不存在的）
+    QList<QPieSlice *> toRemove;
+    for (auto slice : m_pie->slices()) {
+        QString key = slice->label().section(":", 0, 0);
+        if (!ratios.contains(key)) {
+            toRemove.append(slice);
+        }
+    }
+    for (auto slice : toRemove) {
+        m_pie->remove(slice);
     }
 }
 
@@ -109,50 +146,6 @@ void PlotSeparation::init()
     m_chartLine->legend()->setAlignment(Qt::AlignBottom);
     m_chartLine->setTitle(tr("Separation"));
 
-    m_curve_mix = new QLineSeries();
-    m_curve_sugar = new QLineSeries();
-    m_curve_salt = new QLineSeries();
-    m_curve_powder = new QLineSeries();
-
-    m_base_sugar = new QLineSeries();
-    m_base_salt = new QLineSeries();
-    m_base_powder = new QLineSeries();
-
-    m_chartLine->addSeries(m_curve_mix);
-    m_curve_mix->setName("mix");
-    m_curve_mix->attachAxis(m_axisX);
-    m_curve_mix->attachAxis(m_axisY);
-
-    m_chartLine->addSeries(m_curve_sugar);
-    m_curve_sugar->setName("sugar");
-    m_curve_sugar->attachAxis(m_axisX);
-    m_curve_sugar->attachAxis(m_axisY);
-
-    m_chartLine->addSeries(m_curve_salt);
-    m_curve_salt->setName("salt");
-    m_curve_salt->attachAxis(m_axisX);
-    m_curve_salt->attachAxis(m_axisY);
-
-    m_chartLine->addSeries(m_curve_powder);
-    m_curve_powder->setName("powder");
-    m_curve_powder->attachAxis(m_axisX);
-    m_curve_powder->attachAxis(m_axisY);
-
-    m_chartLine->addSeries(m_base_sugar);
-    m_base_sugar->setName("base sugar");
-    m_base_sugar->attachAxis(m_axisX);
-    m_base_sugar->attachAxis(m_axisY);
-
-    m_chartLine->addSeries(m_base_salt);
-    m_base_salt->setName("base salt");
-    m_base_salt->attachAxis(m_axisX);
-    m_base_salt->attachAxis(m_axisY);
-
-    m_chartLine->addSeries(m_base_powder);
-    m_base_powder->setName("base powder");
-    m_base_powder->attachAxis(m_axisX);
-    m_base_powder->attachAxis(m_axisY);
-
     m_ViewLine = new MyChartView(m_chartLine, this);
     m_ViewLine->setRenderHint(QPainter::Antialiasing);
     ui->gLayPlot->addWidget(m_ViewLine);
@@ -161,26 +154,9 @@ void PlotSeparation::init()
     m_showBase = false;
     ui->tBtnStandardCurve->setCheckable(true);
 
-    m_material[0] = "Sugar";
-    m_material[1] = "Salt";
-    m_material[2] = "Powder";
     m_chartPie = new QChart();
     m_pie = new QPieSeries();
-    m_pie->append(m_material[0], 1.0 / 3 * 100);
-    m_pie->append(m_material[1], 1.0 / 3 * 100);
-    m_pie->append(m_material[2], 1.0 / 3 * 100);
 
-    m_pie->slices().at(0)->setLabel(QString("Sugar: %1%").arg(1.0 / 3 * 100, 0, 'f', 2));
-    m_pie->slices().at(1)->setLabel(QString("Salt: %1%").arg(1.0 / 3 * 100, 0, 'f', 2));
-    m_pie->slices().at(2)->setLabel(QString("Powder: %1%").arg(1.0 / 3 * 100, 0, 'f', 2));
-    for (auto slice : m_pie->slices()) {
-        slice->setLabelVisible(false);
-
-        // 连接悬浮信号
-        connect(slice, &QPieSlice::hovered, this, [slice](bool hovered) {
-            slice->setLabelVisible(hovered);
-        });
-    }
     m_chartPie->addSeries(m_pie);
     m_chartPie->setTitle(tr("Proportion"));
     m_chartPie->legend()->setAlignment(Qt::AlignBottom);
@@ -202,8 +178,9 @@ void PlotSeparation::on_tBtnStandardCurve_clicked()
     if (m_showBase) {
         emit sendSeparationStandard();
     }
-
-    m_base_salt->setVisible(m_showBase);
-    m_base_sugar->setVisible(m_showBase);
-    m_base_powder->setVisible(m_showBase);
+    for (auto it = m_curveMap.begin(); it != m_curveMap.end(); ++it) {
+        if (it.key().endsWith("_base")) {
+            it.value()->setVisible(m_showBase);
+        }
+    }
 }
