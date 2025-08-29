@@ -169,28 +169,33 @@ target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
 
 include(ExternalProject)
 
+# 安装路径
 set(FFTW_PREFIX ${CMAKE_BINARY_DIR}/fftw)
 set(FFTW_SRC ${CMAKE_SOURCE_DIR}/vendor/fftw-3.3.10)
 
 ExternalProject_Add(fftw_external
     SOURCE_DIR ${FFTW_SRC}
-    BINARY_DIR ${CMAKE_BINARY_DIR}/fftw_build
-    CONFIGURE_COMMAND ${FFTW_SRC}/configure --prefix=${FFTW_PREFIX}
-                    --enable-shared
-                    --disable-threads
-                    --disable-openmp
-                    --disable-mpi
-    BUILD_COMMAND make -j4
-    INSTALL_COMMAND make install
-    UPDATE_COMMAND ""
-    PATCH_COMMAND ""
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${FFTW_PREFIX}
+        -DBUILD_SHARED_LIBS=ON          # ON 生成动态库, OFF 静态库
+        -DENABLE_THREADS=OFF            # 单线程
+        -DENABLE_OPENMP=OFF
+        -DENABLE_MPI=OFF
+        -DENABLE_FLOAT=OFF
+        -DENABLE_LONG_DOUBLE=OFF
+        -DENABLE_QUAD_PRECISION=OFF
+    UPDATE_COMMAND ""                  # 禁止自动下载更新
+    PATCH_COMMAND ""                   # 禁止 patch
 )
-
 
 add_dependencies(${PROJECT_NAME} fftw_external)
 target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_PREFIX}/include)
 target_link_directories(${PROJECT_NAME} PRIVATE ${FFTW_PREFIX}/lib)
-target_link_libraries(${PROJECT_NAME} PRIVATE fftw3 m)
+target_link_libraries(${PROJECT_NAME} PRIVATE fftw3)
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(${PROJECT_NAME} PRIVATE m)
+endif()
 
 
 configure_file(
