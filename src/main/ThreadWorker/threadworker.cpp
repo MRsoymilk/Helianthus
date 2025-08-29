@@ -7,6 +7,9 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include "myhttp.h"
+#include <cmath>
+#include <complex>
+#include <fftw3.h>
 
 ThreadWorker::ThreadWorker(QObject *parent)
     : QObject(parent)
@@ -148,6 +151,10 @@ void ThreadWorker::processData(const QByteArray &data24)
         emit sendLineInfo(val_average, val_distance);
     }
 
+    if (m_do_derivative) {
+    }
+    if (m_do_fourier) {
+    }
     emit dataForTableReady(v_voltage24, raw24);
     emit dataForPlotReady(out24, xMin, xMax, yMin, yMax);
 
@@ -306,6 +313,20 @@ void ThreadWorker::otoRequest()
         emit sendLineInfo(val_average, val_distance);
     }
 
+    if (m_do_derivative) {
+        derivativeData(v_voltage24);
+    }
+    if (m_do_fourier) {
+        yMin = std::numeric_limits<double>::max();
+        yMax = std::numeric_limits<double>::lowest();
+        v_voltage24 = fourierData(v_voltage24);
+        for (int i = 0; i < out24.size(); ++i) {
+            out24[i].setY(v_voltage24[i]);
+            yMin = std::min(yMin, out24[i].y());
+            yMax = std::max(yMax, out24[i].y());
+        }
+    }
+
     emit dataForTableReady(v_voltage24, raw24);
     emit dataForPlotReady(out24, xMin, xMax, yMin, yMax);
 
@@ -323,6 +344,84 @@ void ThreadWorker::otoRequest()
     if (m_plot_separation) {
         sendSeparationRequest(v_voltage24);
     }
+}
+
+void ThreadWorker::derivativeData(const QVector<double> &v)
+{
+    int N = v.size();
+    if (N < 2) {
+        return;
+    }
+
+    QVector<double> deriv(N);
+
+    // 边界处理：前向差分 & 后向差分
+    deriv[0] = v[1] - v[0];
+    deriv[N - 1] = v[N - 1] - v[N - 2];
+
+    // 中心差分
+    for (int i = 1; i < N - 1; i++) {
+        deriv[i] = (v[i + 1] - v[i - 1]) / 2.0;
+    }
+    emit derivativeReady(deriv);
+}
+
+QVector<double> ThreadWorker::fourierData(const QVector<double> &v, double fs, double cutoff_ratio)
+{
+    int N = v.size();
+    if (N == 0)
+        return {};
+
+    // 分配 FFTW 输入输出
+    double *in = (double *) fftw_malloc(sizeof(double) * N);
+    fftw_complex *out = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * (N / 2 + 1));
+
+    for (int i = 0; i < N; ++i)
+        in[i] = v[i];
+
+    // 正向 FFT
+    fftw_plan p = fftw_plan_dft_r2c_1d(N, in, out, FFTW_ESTIMATE);
+    fftw_execute(p);
+
+    // 频率坐标
+    QVector<double> freq(N / 2 + 1);
+    for (int i = 0; i <= N / 2; ++i)
+        freq[i] = i * fs / N;
+
+    // 幅值谱
+    QVector<double> magnitude(N / 2 + 1);
+    for (int i = 0; i <= N / 2; ++i) {
+        double real = out[i][0];
+        double imag = out[i][1];
+        magnitude[i] = std::sqrt(real * real + imag * imag);
+    }
+
+    // 低通滤波
+    int cutoff = int(cutoff_ratio * N);
+    for (int i = cutoff; i <= N / 2; ++i) {
+        out[i][0] = 0;
+        out[i][1] = 0;
+    }
+
+    // 逆变换
+    QVector<double> smoothed(N);
+    fftw_plan backward = fftw_plan_dft_c2r_1d(N, out, smoothed.data(), FFTW_ESTIMATE);
+    fftw_execute(backward);
+
+    // 归一化
+    for (int i = 0; i < N; ++i)
+        smoothed[i] /= N;
+
+    // 释放资源
+    fftw_destroy_plan(p);
+    fftw_destroy_plan(backward);
+    fftw_free(in);
+    fftw_free(out);
+
+    // 发信号
+    emit fourierSpectrumReady(freq, magnitude);
+
+    return smoothed;
 }
 
 void ThreadWorker::sendPredictRequest(const QVector<double> &v_voltage24)
@@ -424,6 +523,16 @@ void ThreadWorker::onPlotSeparationStandard()
 void ThreadWorker::onSelfTrainRecord(bool isDo)
 {
     m_self_train_record = isDo;
+}
+
+void ThreadWorker::doDerivative(bool isDo)
+{
+    m_do_derivative = isDo;
+}
+
+void ThreadWorker::doFourier(bool isDo)
+{
+    m_do_fourier = isDo;
 }
 
 void ThreadWorker::sendSeparationRequest(const QVector<double> &v_voltage24)

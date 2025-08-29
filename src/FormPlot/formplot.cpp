@@ -2,6 +2,7 @@
 #include "PlotData/plotdata.h"
 #include "PlotFilter/plotfilter.h"
 #include "PlotHistory/plothistory.h"
+#include "PlotPostProcess/plotpostprocess.h"
 #include "PlotSeparation/plotseparation.h"
 #include "g_define.h"
 #include "ui_formplot.h"
@@ -83,6 +84,16 @@ void FormPlot::onSendSeparationSeries(const QList<QPointF> v,
 void FormPlot::onSendSeparationInfo(QMap<QString, double> ratios)
 {
     m_plotSeparation->setSeparationInfo(ratios);
+}
+
+void FormPlot::onDerivative(const QVector<double> &deriv)
+{
+    m_postProcess->updateChart(deriv);
+}
+
+void FormPlot::onFourierSpectrumReady(const QVector<double> &freq, const QVector<double> &magnitude)
+{
+    m_postProcess->updateChart(freq, magnitude);
 }
 
 void FormPlot::init()
@@ -176,6 +187,12 @@ void FormPlot::init()
         ui->spinBox_ms->setValue(
             SETTING_CONFIG_GET(CFG_GROUP_TRANSMISSION, CFG_INTEGRATION).toInt());
     }
+
+    m_postProcess = new PlotPostProcess;
+    m_doDerivative = false;
+    ui->tBtnDerivative->setCheckable(true);
+    m_doFourier = false;
+    ui->tBtnFourier->setCheckable(true);
 }
 
 void FormPlot::on_tBtnZoom_clicked()
@@ -328,8 +345,9 @@ void FormPlot::on_tBtnPicture_clicked()
                                                     "picture.png",
                                                     tr("PNG(*.png);;JPEG(*.jpg);;BMP(*.bmp)"));
 
-    if (fileName.isEmpty())
+    if (fileName.isEmpty()) {
         return;
+    }
 
     QPixmap pixmap = m_view->grab();
     if (!pixmap.save(fileName)) {
@@ -365,5 +383,27 @@ void FormPlot::on_tBtnSeparation_clicked()
         m_plotSeparation->show();
     } else {
         m_plotSeparation->hide();
+    }
+}
+
+void FormPlot::on_tBtnDerivative_clicked()
+{
+    m_doDerivative = !m_doDerivative;
+    emit todoDerivative(m_doDerivative);
+    if (m_doDerivative || m_doFourier) {
+        m_postProcess->show();
+    } else {
+        m_postProcess->hide();
+    }
+}
+
+void FormPlot::on_tBtnFourier_clicked()
+{
+    m_doFourier = !m_doFourier;
+    emit todoFourier(m_doFourier);
+    if (m_doFourier || m_doDerivative) {
+        m_postProcess->show();
+    } else {
+        m_postProcess->hide();
     }
 }

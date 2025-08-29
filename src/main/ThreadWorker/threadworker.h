@@ -23,6 +23,8 @@ public slots:
     void onSendFilter(const double &average, const double &distance);
     void onPlotSeparationStandard();
     void onSelfTrainRecord(bool isDo);
+    void doDerivative(bool isDo);
+    void doFourier(bool isDo);
 
 signals:
     void dataForTableReady(const QVector<double> &v24, const QVector<qint32> &raw24);
@@ -46,6 +48,8 @@ signals:
                               const double &y_min,
                               const double &y_max);
     void sendSeparationInfo(QMap<QString, double> ratios);
+    void derivativeReady(const QVector<double> &deriv);
+    void fourierSpectrumReady(const QVector<double> &freq, const QVector<double> &magnitude);
 
 private:
     void processCurve24(const QByteArray &data24,
@@ -57,6 +61,10 @@ private:
     void sendSeparationRequest(const QVector<double> &v_voltage24);
     void otoRequest();
     void toPoints(const QJsonArray &arr, QString name);
+    void derivativeData(const QVector<double> &v);
+    QVector<double> fourierData(const QVector<double> &v,
+                                double fs = 1.0,
+                                double cutoff_ratio = 0.05);
 
 private:
     QTimer *m_timer;
@@ -75,6 +83,8 @@ private:
     double m_filter_distance;
     QString m_url_separation;
     QString m_url_classify;
+    bool m_do_derivative;
+    bool m_do_fourier;
 };
 
 #endif // THREADWORKER_H

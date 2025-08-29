@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Helianthus VERSION 0.0.18 LANGUAGES CXX)
+project(Helianthus VERSION 0.0.19 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -59,6 +59,9 @@ set(PROJECT_SOURCES
         src/FormPlot/PlotSeparation/plotseparation.h
         src/FormPlot/PlotSeparation/plotseparation.cpp
         src/FormPlot/PlotSeparation/plotseparation.ui
+        src/FormPlot/PlotPostProcess/plotpostprocess.h
+        src/FormPlot/PlotPostProcess/plotpostprocess.cpp
+        src/FormPlot/PlotPostProcess/plotpostprocess.ui
         src/FormHistory/formhistory.h
         src/FormHistory/formhistory.cpp
         src/FormHistory/formhistory.ui
@@ -140,7 +143,7 @@ target_link_libraries(Helianthus PRIVATE
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Helianthus)
+  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.soymilk.Helianthus)
 endif()
 set_target_properties(Helianthus PROPERTIES
     ${BUNDLE_ID_OPTION}
@@ -163,6 +166,32 @@ endif()
 
 add_subdirectory(vendor/spdlog-1.15.0/)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
+
+include(ExternalProject)
+
+set(FFTW_PREFIX ${CMAKE_BINARY_DIR}/fftw)
+set(FFTW_SRC ${CMAKE_SOURCE_DIR}/vendor/fftw-3.3.10)
+
+ExternalProject_Add(fftw_external
+    SOURCE_DIR ${FFTW_SRC}
+    BINARY_DIR ${CMAKE_BINARY_DIR}/fftw_build
+    CONFIGURE_COMMAND ${FFTW_SRC}/configure --prefix=${FFTW_PREFIX}
+                    --enable-shared
+                    --disable-threads
+                    --disable-openmp
+                    --disable-mpi
+    BUILD_COMMAND make -j4
+    INSTALL_COMMAND make install
+    UPDATE_COMMAND ""
+    PATCH_COMMAND ""
+)
+
+
+add_dependencies(${PROJECT_NAME} fftw_external)
+target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_PREFIX}/include)
+target_link_directories(${PROJECT_NAME} PRIVATE ${FFTW_PREFIX}/lib)
+target_link_libraries(${PROJECT_NAME} PRIVATE fftw3 m)
+
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in

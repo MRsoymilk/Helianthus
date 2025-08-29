@@ -12,6 +12,7 @@ class PlotData;
 class PlotHistory;
 class PlotFilter;
 class PlotSeparation;
+class PlotPostProcess;
 
 class FormPlot : public QWidget
 {
@@ -36,6 +37,9 @@ signals:
     void sendPlotSeparation(bool isDo);
     void sendSeparationStandard();
 
+    void todoFourier(bool isDo);
+    void todoDerivative(bool isDo);
+
 public slots:
     void onSerialDataReceived(const QByteArray &data24);
     void updatePlot(const QList<QPointF> &v24,
@@ -51,6 +55,8 @@ public slots:
                                 const double y_min,
                                 const double y_max);
     void onSendSeparationInfo(QMap<QString, double> ratios);
+    void onDerivative(const QVector<double> &deriv);
+    void onFourierSpectrumReady(const QVector<double> &freq, const QVector<double> &magnitude);
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
@@ -70,6 +76,8 @@ private slots:
     void on_tBtnClassify_clicked();
     void on_tBtnFilter_clicked();
     void on_tBtnSeparation_clicked();
+    void on_tBtnDerivative_clicked();
+    void on_tBtnFourier_clicked();
 
 private:
     void init();
@@ -94,7 +102,10 @@ private:
     PlotHistory *m_plotHistory;
     PlotFilter *m_plotFilter;
     PlotSeparation *m_plotSeparation;
+    PlotPostProcess *m_postProcess;
     METHOD m_method;
+    bool m_doDerivative;
+    bool m_doFourier;
 };
 
 #endif // FORMPLOT_H

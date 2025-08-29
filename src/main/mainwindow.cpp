@@ -72,6 +72,8 @@ void MainWindow::init()
     connect(m_plot, &FormPlot::sendPlotBaselineSub, m_worker, &ThreadWorker::onPlotSubBaseline);
     connect(m_plot, &FormPlot::sendPlotClassify, m_worker, &ThreadWorker::onPlotClassify);
     connect(m_plot, &FormPlot::sendPlotSeparation, m_worker, &ThreadWorker::onPlotSeparation);
+    connect(m_plot, &FormPlot::todoDerivative, m_worker, &ThreadWorker::doDerivative);
+    connect(m_plot, &FormPlot::todoFourier, m_worker, &ThreadWorker::doFourier);
     connect(m_plot,
             &FormPlot::sendSeparationStandard,
             m_worker,
@@ -90,6 +92,11 @@ void MainWindow::init()
             m_history,
             &FormHistory::recordHistory,
             Qt::QueuedConnection);
+    connect(m_worker, &ThreadWorker::derivativeReady, m_plot, &FormPlot::onDerivative);
+    connect(m_worker,
+            &ThreadWorker::fourierSpectrumReady,
+            m_plot,
+            &FormPlot::onFourierSpectrumReady);
     connect(m_oto, &FormOTO::otoRequest, m_worker, &ThreadWorker::onOtoRequest);
     connect(m_oto, &FormOTO::otoCallParams, m_plot, &FormPlot::onSendParams);
     connect(m_worker, &ThreadWorker::otoRequestRaw, m_oto, &FormOTO::onOtoRequestRaw);
